@@ -1,0 +1,174 @@
+NAME "Crystal Assembler"
+
+-- ExtendedAE Crystal Assembler automation
+-- Labels needed:
+--   Barrel    => input chest/barrel with all ingredients
+--   Assembler => all Crystal Assembler machines
+--   Storage   => output storage
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+
+    -- All printed processor types (logic, calc, eng, concurrent, accumulation, energy)
+    OUTPUT RETAIN 4 EACH *printed*processor* TO EACH Assembler
+    OUTPUT RETAIN 4 ae2:printed_silicon TO EACH Assembler
+    OUTPUT RETAIN 4 minecraft:redstone,
+           RETAIN 4 ae2:fluix_dust
+    TO EACH Assembler
+
+    -- active_formation_plane
+    OUTPUT RETAIN 1 ae2:formation_plane,
+           RETAIN 3 minecraft:piston,
+           RETAIN 2 ae2:formation_core,
+           RETAIN 1 extendedae:ex_export_bus_part
+    TO EACH Assembler
+
+    -- smart_annihilation_plane
+    OUTPUT RETAIN 1 ae2:annihilation_plane,
+           RETAIN 2 ae2:annihilation_core,
+           RETAIN 1 extendedae:ex_import_bus_part
+    TO EACH Assembler
+
+    -- assembler_matrix_crafter
+    OUTPUT RETAIN 1 extendedae:assembler_matrix_wall,
+           RETAIN 1 extendedae:ex_molecular_assembler,
+           RETAIN 6 ae2:purple_lumen_paint_ball,
+           RETAIN 1 ae2:logic_processor
+    TO EACH Assembler
+
+    -- assembler_matrix_pattern
+    OUTPUT RETAIN 1 extendedae:ex_pattern_provider,
+           RETAIN 6 ae2:blue_lumen_paint_ball,
+           RETAIN 1 ae2:engineering_processor
+    TO EACH Assembler
+
+    -- assembler_matrix_speed
+    OUTPUT RETAIN 8 ae2:speed_card,
+           RETAIN 6 ae2:red_lumen_paint_ball,
+           RETAIN 1 extendedae:concurrent_processor
+    TO EACH Assembler
+
+    -- budding (also needs water fluid piped in separately)
+    OUTPUT RETAIN 1 extendedae:entro_seed,
+           RETAIN 1 ae2:fluix_block
+    TO EACH Assembler
+
+    -- caner
+    OUTPUT RETAIN 1 extendedae:machine_frame,
+           RETAIN 1 extendedae:ingredient_buffer
+    TO EACH Assembler
+
+    -- circuit_cutter
+    OUTPUT RETAIN 8 ae2:engineering_processor,
+           RETAIN 1 ae2:calculation_processor_press,
+           RETAIN 1 ae2:engineering_processor_press,
+           RETAIN 1 ae2:logic_processor_press,
+           RETAIN 1 ae2:silicon_press,
+           RETAIN 1 extendedae:concurrent_processor_press,
+           RETAIN 1 minecraft:stonecutter
+    TO EACH Assembler
+
+    -- concurrent_press
+    OUTPUT RETAIN 3 minecraft:ender_eye,
+           RETAIN 4 extendedae:entro_crystal
+    TO EACH Assembler
+
+    -- crystal_fixer
+    OUTPUT RETAIN 4 WITH #ae2:all_certus_quartz,
+           RETAIN 2 ae2:quartz_fiber
+    TO EACH Assembler
+
+    -- entro_ingot_transformation (also needs water fluid piped in separately)
+    OUTPUT RETAIN 4 extendedae:entro_dust,
+           RETAIN 4 minecraft:gold_ingot,
+           RETAIN 4 minecraft:lapis_lazuli
+    TO EACH Assembler
+
+    -- ex_charger
+    OUTPUT RETAIN 1 ae2:charger,
+           RETAIN 3 ae2:capacity_card
+    TO EACH Assembler
+
+    -- ex_drive
+    OUTPUT RETAIN 1 ae2:drive,
+           RETAIN 2 WITH #ae2:glass_cable
+    TO EACH Assembler
+
+    -- ex_export_bus / ex_import_bus / ex_inscriber
+    OUTPUT RETAIN 1 ae2:export_bus,
+           RETAIN 1 ae2:import_bus,
+           RETAIN 1 ae2:inscriber
+    TO EACH Assembler
+
+    -- ex_interface
+    OUTPUT RETAIN 1 WITH #ae2:interface,
+           RETAIN 3 ae2:quartz_glass
+    TO EACH Assembler
+
+    -- ex_io_port
+    OUTPUT RETAIN 1 ae2:io_port,
+           RETAIN 3 ae2:logic_processor,
+           RETAIN 2 extendedae:concurrent_processor
+    TO EACH Assembler
+
+    -- ex_molecular_assembler
+    OUTPUT RETAIN 4 ae2:molecular_assembler
+    TO EACH Assembler
+
+    -- ex_pattern_access_terminal
+    OUTPUT RETAIN 1 ae2:pattern_access_terminal,
+           RETAIN 1 minecraft:redstone_lamp,
+           RETAIN 4 ae2:quartz_fixture
+    TO EACH Assembler
+
+    -- ex_pattern_provider
+    OUTPUT RETAIN 1 WITH #ae2:pattern_provider,
+           RETAIN 3 minecraft:crafting_table
+    TO EACH Assembler
+
+    -- fluix_transformation (also needs water fluid piped in separately)
+    OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal,
+           RETAIN 4 minecraft:quartz
+    TO EACH Assembler
+
+    -- oversize_interface
+    OUTPUT RETAIN 1 extendedae:ex_interface TO EACH Assembler
+
+    -- redstone_crystal (also needs water fluid piped in separately)
+    OUTPUT RETAIN 4 minecraft:redstone_block,
+           RETAIN 4 minecraft:glowstone_dust
+    TO EACH Assembler
+
+    -- sky_bronze / sky_steel / sky_osmium (also needs lava fluid piped in separately)
+    OUTPUT RETAIN 4 ae2:sky_stone_block,
+           RETAIN 4 minecraft:copper_ingot,
+           RETAIN 4 minecraft:iron_ingot,
+           RETAIN 4 minecraft:gold_ingot
+    TO EACH Assembler
+
+    -- wireless_connector
+    OUTPUT RETAIN 2 WITH #ae2:smart_dense_cable,
+           RETAIN 2 ae2:wireless_receiver,
+           RETAIN 3 ae2:wireless_booster
+    TO EACH Assembler
+
+    -- wireless_hub
+    OUTPUT RETAIN 1 extendedae:wireless_connect,
+           RETAIN 8 WITH #ae2:smart_cable,
+           RETAIN 1 ae2:quantum_link
+    TO EACH Assembler
+
+    -- wireless_kit
+    OUTPUT RETAIN 2 minecraft:iron_ingot,
+           RETAIN 1 ae2:calculation_processor,
+           RETAIN 1 ae2:singularity
+    TO EACH Assembler
+
+    FORGET
+
+    -- Drain finished items to storage
+    INPUT FROM EACH Assembler SLOTS 9
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
