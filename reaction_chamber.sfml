@@ -1,0 +1,94 @@
+NAME "Reaction Chamber"
+
+-- AdvancedAE Reaction Chamber automation
+-- Labels:
+--   Barrel       => input chest with all solid ingredients
+--   WaterTank    => water source tank
+--   LavaTank     => lava source tank
+--   Chamber      => all Reaction Chamber machines
+--   Storage      => output chest for items
+--   FluidStorage => output tank for quantum_infusion_source fluid
+
+EVERY REDSTONE PULSE DO
+
+    -- === WATER RECIPES ===
+    INPUT FROM Barrel
+    INPUT fluid::minecraft:water FROM WaterTank
+
+    -- fluixcrystalfromdust: 32x charged_certus + 32x fluix_dust + 500mb water
+    OUTPUT RETAIN 32 ae2:charged_certus_quartz_crystal,
+           RETAIN 32 ae2:fluix_dust
+    TO EACH Chamber
+
+    -- fluixcrystals: 16x charged_certus + 16x redstone + 16x quartz + 500mb water
+    OUTPUT RETAIN 16 ae2:charged_certus_quartz_crystal,
+           RETAIN 16 minecraft:redstone,
+           RETAIN 16 minecraft:quartz
+    TO EACH Chamber
+
+    -- quartzcrystal: 16x charged_certus + 16x certus_dust + 500mb water
+    OUTPUT RETAIN 16 ae2:charged_certus_quartz_crystal,
+           RETAIN 16 WITH #c:dusts/certus_quartz
+    TO EACH Chamber
+
+    -- entrocrystal: 32x entro_dust + 32x fluix_crystal + 500mb water
+    OUTPUT RETAIN 32 extendedae:entro_dust,
+           RETAIN 32 ae2:fluix_crystal
+    TO EACH Chamber
+
+    -- entroingot: 32x entro_dust + 32x gold + 32x lapis + 500mb water
+    OUTPUT RETAIN 32 extendedae:entro_dust,
+           RETAIN 32 minecraft:gold_ingot,
+           RETAIN 32 minecraft:lapis_lazuli
+    TO EACH Chamber
+
+    -- redstone_crystal (appflux): 16x redstone_block + 16x fluix_crystal + 16x glowstone_dust + 500mb water
+    OUTPUT RETAIN 16 minecraft:redstone_block,
+           RETAIN 16 ae2:fluix_crystal,
+           RETAIN 16 minecraft:glowstone_dust
+    TO EACH Chamber
+
+    -- quantum_infusion: 1x quantum_infused_dust + 4000mb water → quantum_infusion_source fluid
+    OUTPUT RETAIN 1 advanced_ae:quantum_infused_dust TO EACH Chamber
+
+    -- 4000mb covers quantum_infusion; all other water recipes use 500mb
+    OUTPUT RETAIN 4000 fluid::minecraft:water TO EACH Chamber
+
+    FORGET
+
+    -- === LAVA RECIPES ===
+    INPUT FROM Barrel
+    INPUT fluid::minecraft:lava FROM LavaTank
+
+    -- singularity: 64x matter_ball + 100mb lava
+    OUTPUT RETAIN 64 ae2:matter_ball TO EACH Chamber
+
+    -- shatteredsingularity: 1x singularity + 2x ender_dust + 2x sky_dust + 100mb lava
+    OUTPUT RETAIN 1 ae2:singularity,
+           RETAIN 2 WITH #c:dusts/ender_pearl,
+           RETAIN 2 ae2:sky_dust
+    TO EACH Chamber
+
+    -- sky alloys (megacells): 16x charged_certus + 16x sky_stone + 16x metal + 500mb lava
+    OUTPUT RETAIN 16 ae2:charged_certus_quartz_crystal,
+           RETAIN 16 ae2:sky_stone_block,
+           RETAIN 16 minecraft:copper_ingot,
+           RETAIN 16 minecraft:iron_ingot,
+           RETAIN 16 WITH #c:ingots/osmium
+    TO EACH Chamber
+
+    OUTPUT RETAIN 500 fluid::minecraft:lava TO EACH Chamber
+
+    FORGET
+
+    -- === DRAIN ===
+    INPUT FROM EACH Chamber
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+    FORGET
+
+    -- quantum_infusion_source is a fluid output, drain separately
+    INPUT fluid::advanced_ae:quantum_infusion_source FROM EACH Chamber
+    OUTPUT fluid:: TO FluidStorage
+
+END
