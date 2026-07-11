@@ -2,35 +2,29 @@ NAME "Circuit Cutter"
 
 -- ExtendedAE Circuit Cutter automation
 -- Labels needed:
---   Barrel      => input chest/barrel with all block ingredients
---   SlicerCalc  => cutter for printed_calculation_processor (input: ae2:quartz_block)
---   SlicerLogic => cutter for printed_logic_processor       (input: gold block)
---   SlicerEng   => cutter for printed_engineering_processor (input: diamond block)
---   SlicerSi    => cutter for printed_silicon               (input: silicon block)
---   SlicerConc  => cutter for concurrent_processor_print    (input: entro block)
---   SlicerAccum => cutter for printed_accumulation_processor (input: megacells:sky_steel_block) [requires megacells]
---   SlicerEnergy=> cutter for printed_energy_processor      (input: appflux:charged_redstone_block) [requires appflux]
---   Storage     => output storage
+--   Barrel  => input chest/barrel with all block ingredients
+--   Slicer  => all Circuit Cutter machines (each configured to its own recipe)
+--   Storage => output storage
 
 EVERY REDSTONE PULSE DO
 
     INPUT FROM Barrel
 
-    OUTPUT RETAIN 1 ae2:quartz_block                  TO SlicerCalc    SLOTS 0
-    OUTPUT RETAIN 1 WITH #c:storage_blocks/gold        TO SlicerLogic   SLOTS 0
-    OUTPUT RETAIN 1 WITH #c:storage_blocks/diamond     TO SlicerEng     SLOTS 0
-    OUTPUT RETAIN 1 WITH #c:storage_blocks/silicon     TO SlicerSi      SLOTS 0
-    OUTPUT RETAIN 1 WITH #c:storage_blocks/entro       TO SlicerConc    SLOTS 0
+    OUTPUT RETAIN 1 ae2:quartz_block               TO EACH Slicer SLOTS 0
+    OUTPUT RETAIN 1 WITH #c:storage_blocks/gold     TO EACH Slicer SLOTS 0
+    OUTPUT RETAIN 1 WITH #c:storage_blocks/diamond  TO EACH Slicer SLOTS 0
+    OUTPUT RETAIN 1 WITH #c:storage_blocks/silicon  TO EACH Slicer SLOTS 0
+    OUTPUT RETAIN 1 extendedae:entro_block          TO EACH Slicer SLOTS 0
 
     -- Uncomment if you have megacells installed:
-    -- OUTPUT RETAIN 1 megacells:sky_steel_block        TO SlicerAccum   SLOTS 0
+    -- OUTPUT RETAIN 1 megacells:sky_steel_block       TO EACH Slicer SLOTS 0
 
     -- Uncomment if you have appflux installed:
-    -- OUTPUT RETAIN 1 appflux:charged_redstone_block   TO SlicerEnergy  SLOTS 0
+    -- OUTPUT RETAIN 1 appflux:charged_redstone_block  TO EACH Slicer SLOTS 0
 
     FORGET
 
-    INPUT FROM SlicerCalc, SlicerLogic, SlicerEng, SlicerSi, SlicerConc SLOTS 1
+    INPUT FROM EACH Slicer SLOTS 1
     OUTPUT TO EMPTY SLOTS IN Storage
 
 END
