@@ -58,6 +58,14 @@ project-wakanda/
 
 ---
 
+> **Power feeds target a specific face on purpose.** Every `.sfml`
+> program below reads/writes energy via an explicit `TOP SIDE`
+> qualifier on both `Battery` and the machine label, not just a bare
+> label reference. This is required for Mekanism (see the gotcha under
+> `crusher.sfml`) and is good practice everywhere else too — pin it to
+> whichever face you actually wired for power, on every machine and the
+> battery itself.
+
 ## `sfm/crystal_assembler.sfml`
 
 Automates every ExtendedAE Crystal Assembler recipe **and** keeps the
