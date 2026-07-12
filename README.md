@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="banner.webp" alt="Project-Wakanda" />
+<img src="banner.webp" alt="ColossusCraft: Project-Wakanda" />
 
-# Project-Wakanda
+# ColossusCraft: Project-Wakanda
 
 ### *Wakanda Forever. The base runs itself now.*
 
@@ -15,6 +15,7 @@ actively fights you on it.
 
 [![Status](https://img.shields.io/badge/status-online-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
 [![Platform](https://img.shields.io/badge/platform-ATM10%20%2F%20NeoForge-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
+[![Suite](https://img.shields.io/badge/part%20of-ColossusCraft-00e5ff?style=for-the-badge&labelColor=0a0a0a)](https://github.com/Deaeath/ColossusCraft)
 [![Tech](https://img.shields.io/badge/tech-vibranium-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
 [![License](https://img.shields.io/badge/license-Wakandan%20Council-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
 
