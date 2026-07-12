@@ -14,11 +14,11 @@
 -- Build requirements:
 --   - A clear 1x1 (or wider, turtle just needs its own column clear)
 --     vertical shaft spanning every floor you want to stop at.
---   - The turtle sitting in that shaft, powered.
+--   - The turtle sitting in that shaft, powered, with the Chat Box
+--     turtle upgrade (see jarvis.lua's Chat Box notes -- crafted
+--     upgrade, not adjacent block). Chat is the only control method --
+--     no redstone/physical buttons in this version.
 --   - Fuel: any standard turtle fuel item in its inventory.
---   - Optional: Chat Box turtle upgrade (see jarvis.lua's Chat Box notes
---     -- crafted upgrade, not adjacent block) for chat-commanded calls.
---   - Optional: physical call buttons -- see REDSTONE_CALLS below.
 --   - To auto-start on boot: save this file's contents as "startup" on
 --     the turtle (or `copy elevator startup` if you've already got it
 --     saved under a different name), then `reboot`. It'll launch and
@@ -26,29 +26,19 @@
 --
 -- Configure FLOORS below. "height" is blocks from the BOTTOM of the
 -- shaft (where the turtle starts), not a world Y-coordinate -- only the
--- DIFFERENCE between two floors matters, and world Y11 to Y44 is a 33
--- block gap, so "lower" is 0 and "upper" is 33.
+-- DIFFERENCE between two floors matters. This table scales fine to
+-- hundreds of entries with no redesign needed -- findFloor() is a
+-- linear scan but that's trivial even at hundreds of floors, and
+-- "floors" just lists whatever's configured (expect a long chat message
+-- if you actually fill in hundreds of names).
 --
--- IMPORTANT: the turtle must actually be sitting at the "lower" (Y11)
--- position when this script starts, since currentFloorIndex defaults to
--- FLOORS[1] with no GPS to verify it. If the turtle starts at the upper
--- floor instead, swap the order of these two entries.
+-- IMPORTANT: the turtle must actually be sitting at FLOORS[1]'s position
+-- when this script starts, since currentFloorIndex defaults to 1 with
+-- no GPS to verify it. Order entries bottom-to-top to match where the
+-- turtle actually starts.
 local FLOORS = {
     { name = "lower", height = 0 },
     { name = "upper", height = 33 },
-}
-
--- Physical call buttons: run redstone wire (dust + repeaters as needed)
--- from a lever/button at each floor down/up the shaft to a distinct side
--- on the turtle. When that side goes high, the elevator is called to the
--- mapped floor -- no chat command needed. Only sides not otherwise used
--- (the turtle needs "top"/"bottom" free for movement, though redstone
--- input doesn't actually block movement, it's just avoided here for
--- clarity) are mapped below; add/remove entries to match how you wire it.
--- Leave empty ({}) to disable physical call buttons entirely.
-local REDSTONE_CALLS = {
-    front = "lower",
-    back  = "upper",
 }
 
 local NAME = "ELEVATOR"
@@ -64,10 +54,16 @@ local function say(msg)
 end
 
 -- currentFloorIndex tracks where the turtle THINKS it is. It's only
--- accurate if every call completes fully -- if the turtle gets stuck
--- mid-move (fuel out, obstruction) this can drift from reality. Run
--- "elevator resync <floor name>" to manually correct it if that happens.
+-- accurate if every call completes fully -- if the turtle gets stopped
+-- mid-move (manually, fuel out, obstruction) this can drift from
+-- reality. Run "elevator resync <floor name>" to manually correct it.
 local currentFloorIndex = 1
+
+-- Set while a move is in progress (for "status") and used to let "stop"
+-- interrupt "start" resume a partially-completed move.
+local moving = false
+local stopRequested = false
+local pendingTargetIndex = nil
 
 local function findFloor(name)
     for i, floor in ipairs(FLOORS) do
@@ -97,12 +93,19 @@ end
 -- pushing anything (including a player) in the shaft along with it.
 -- Retries on obstruction instead of giving up immediately -- a player
 -- riding the lift IS the expected "obstruction" this pushes through.
+-- Returns (blocksActuallyMoved, stoppedEarly).
 local function moveVertical(blocks, goingUp)
     local moveFn = goingUp and turtle.up or turtle.down
     for i = 1, blocks do
+        if stopRequested then
+            return i - 1, true
+        end
         local moved = false
         local attempts = 0
         while not moved and attempts < 10 do
+            if stopRequested then
+                return i - 1, true
+            end
             moved = moveFn()
             if not moved then
                 attempts = attempts + 1
@@ -111,36 +114,91 @@ local function moveVertical(blocks, goingUp)
         end
         if not moved then
             say("Blocked and couldn't clear the shaft after multiple attempts. Stopping.")
-            return false
+            return i - 1, false
         end
     end
-    return true
+    return blocks, false
 end
 
-local function goToFloor(targetIndex)
-    if targetIndex == currentFloorIndex then
-        say("Already at " .. FLOORS[targetIndex].name .. ".")
-        return
+-- The actual move, run as one branch of parallel.waitForAny so a "stop"
+-- chat command arriving on the other branch can end it early. Since
+-- FLOORS only stores each floor's absolute height (not "how far from
+-- wherever we currently are"), resuming after a partial move re-reads
+-- the turtle's CURRENT position via currentHeightEstimate rather than
+-- assuming it's still at the floor it left from.
+local currentHeightEstimate = nil -- set on first goToFloor call
+
+local function doMove(targetIndex)
+    moving = true
+    stopRequested = false
+
+    if currentHeightEstimate == nil then
+        currentHeightEstimate = FLOORS[currentFloorIndex].height
     end
 
-    local from = FLOORS[currentFloorIndex]
     local to = FLOORS[targetIndex]
-    local delta = to.height - from.height
+    local delta = to.height - currentHeightEstimate
     local blocks = math.abs(delta)
     local goingUp = delta > 0
 
-    if not ensureFuel(blocks) then
-        say("Not enough fuel to reach " .. to.name .. " (" .. blocks .. " blocks needed).")
+    if blocks == 0 then
+        currentFloorIndex = targetIndex
+        pendingTargetIndex = nil
+        moving = false
+        say("Already at " .. to.name .. ".")
         return
     end
 
+    if not ensureFuel(blocks) then
+        say("Not enough fuel to reach " .. to.name .. " (" .. blocks .. " blocks needed).")
+        moving = false
+        return
+    end
+
+    pendingTargetIndex = targetIndex
     say("Heading to " .. to.name .. (goingUp and " (up)" or " (down)") .. "...")
-    if moveVertical(blocks, goingUp) then
+    local moved, stoppedEarly = moveVertical(blocks, goingUp)
+    currentHeightEstimate = currentHeightEstimate + (goingUp and moved or -moved)
+
+    moving = false
+    if stoppedEarly then
+        say("Stopped partway to " .. to.name .. ". Say 'elevator start' to continue, or 'elevator resync <floor>' if the shaft position isn't what you expect.")
+    elseif moved == blocks then
         currentFloorIndex = targetIndex
+        pendingTargetIndex = nil
         say("Arrived at " .. to.name .. ".")
     else
-        say("Didn't make it to " .. to.name .. " -- run 'elevator resync <floor>' once you know where the turtle actually is.")
+        say("Didn't make it to " .. to.name .. " -- say 'elevator start' to retry, or 'elevator resync <floor>' once you know where the turtle actually is.")
     end
+end
+
+-- Runs during a move to catch "elevator stop" without blocking movement.
+-- Ends (letting parallel.waitForAny return) the instant stop is heard;
+-- doMove notices stopRequested on its next per-block check.
+local function watchForStop()
+    while true do
+        local event, username, message = os.pullEvent("chat")
+        if chat then
+            local prefix = message:match("^[Ee][Ll][Ee][Vv][Aa][Tt][Oo][Rr][,:]?%s*(.*)")
+            if prefix and prefix:lower():gsub("^%s+", ""):gsub("%s+$", "") == "stop" then
+                stopRequested = true
+                say("Stopping...")
+                return
+            end
+        end
+    end
+end
+
+local function goToFloor(targetIndex)
+    if moving then
+        say("Already moving -- say 'elevator stop' first if you want to redirect.")
+        return
+    end
+    if targetIndex == currentFloorIndex and currentHeightEstimate == nil then
+        say("Already at " .. FLOORS[targetIndex].name .. ".")
+        return
+    end
+    parallel.waitForAny(function() doMove(targetIndex) end, watchForStop)
 end
 
 local function listFloors()
@@ -154,9 +212,39 @@ end
 local function handleCommand(cmd, sender)
     cmd = cmd:lower():gsub("^%s+", ""):gsub("%s+$", "")
 
-    if cmd == "floors" or cmd == "status" then
+    if cmd == "floors" then
         listFloors()
-        say("Currently at: " .. FLOORS[currentFloorIndex].name)
+        return
+    end
+
+    if cmd == "status" then
+        if moving then
+            say("Moving toward " .. FLOORS[pendingTargetIndex].name .. "...")
+        elseif pendingTargetIndex then
+            say("Stopped partway to " .. FLOORS[pendingTargetIndex].name .. ". Say 'elevator start' to continue.")
+        else
+            say("Idle at " .. FLOORS[currentFloorIndex].name .. ".")
+        end
+        return
+    end
+
+    if cmd == "stop" then
+        if moving then
+            stopRequested = true
+        else
+            say("Not moving.")
+        end
+        return
+    end
+
+    if cmd == "start" then
+        if moving then
+            say("Already moving.")
+        elseif pendingTargetIndex then
+            goToFloor(pendingTargetIndex)
+        else
+            say("Nothing to resume. Say 'elevator floor <name>' to call it somewhere.")
+        end
         return
     end
 
@@ -165,6 +253,8 @@ local function handleCommand(cmd, sender)
         local idx = findFloor(resyncTarget)
         if idx then
             currentFloorIndex = idx
+            currentHeightEstimate = FLOORS[idx].height
+            pendingTargetIndex = nil
             say("Resynced -- now treating current position as " .. FLOORS[idx].name .. ".")
         else
             say("Unknown floor '" .. resyncTarget .. "'.")
@@ -177,45 +267,23 @@ local function handleCommand(cmd, sender)
     if idx then
         goToFloor(idx)
     else
-        say("Unrecognized command '" .. cmd .. "'. Try: floor <name>, floors, status, resync <name>.")
+        say("Unrecognized command '" .. cmd .. "'. Try: floor <name>, floors, status, stop, start, resync <name>.")
     end
-end
-
-local function callButtonCount()
-    local n = 0
-    for _ in pairs(REDSTONE_CALLS) do n = n + 1 end
-    return n
 end
 
 term.clear()
 term.setCursorPos(1, 1)
 print(NAME .. " online.")
-print("Chat Box:      " .. (chat and "YES" or "no -- chat commands won't work without one"))
-print("Call buttons:  " .. (callButtonCount() > 0 and callButtonCount() .. " side(s) mapped" or "none configured"))
+print("Chat Box: " .. (chat and "YES" or "no -- required, this program only listens for chat commands"))
 listFloors()
-say(NAME .. " ready. Say 'elevator floor <name>' in chat, or use a call button.")
+say(NAME .. " ready. Say 'elevator floor <name>' in chat.")
 
--- Unfiltered event loop -- catches both "chat" (unless no Chat Box, in
--- which case that event type never fires anyway) and "redstone" (fires
--- once per actual signal change on any side, not continuously while a
--- lever is held, so no extra debouncing needed here).
 while true do
-    local event, a, b = os.pullEvent()
-
-    if event == "chat" and chat then
-        local username, message = a, b
+    local event, username, message = os.pullEvent("chat")
+    if chat then
         local prefix = message:match("^[Ee][Ll][Ee][Vv][Aa][Tt][Oo][Rr][,:]?%s*(.*)")
         if prefix and #prefix > 0 then
             handleCommand(prefix, username)
-        end
-    elseif event == "redstone" then
-        for side, floorName in pairs(REDSTONE_CALLS) do
-            if redstone.getInput(side) then
-                local idx = findFloor(floorName)
-                if idx then
-                    goToFloor(idx)
-                end
-            end
         end
     end
 end

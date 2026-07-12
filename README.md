@@ -353,33 +353,34 @@ the script is broken.
 - A clear vertical shaft (turtle's own column, minimum) spanning every
   floor you want to stop at.
 - The turtle sitting in that shaft, powered, fueled.
-- Optional: Chat Box turtle upgrade (see `jarvis.lua`'s notes on why
-  this has to be a crafted upgrade, not an adjacent block) for
-  chat-commanded calls.
-- Optional: physical call buttons — see `REDSTONE_CALLS` below.
+- Chat Box turtle upgrade (see `jarvis.lua`'s notes on why this has to
+  be a crafted upgrade, not an adjacent block) — chat is the only
+  control method, no redstone/physical buttons in this version.
 
 **Configure `FLOORS`** at the top of the file — each entry is `{name,
 height}`, where height is blocks from the bottom of the shaft (where the
-turtle starts). Edit to match your actual base.
-
-**Configure `REDSTONE_CALLS`** to wire physical call buttons: run
-redstone (dust + repeaters as needed) from a lever/button at each floor
-to a distinct side on the turtle, then map that side to a floor name —
-e.g. `{ front = "lower", back = "upper" }`. Leave it as `{}` to disable
-physical calls entirely and rely on chat only. The event loop catches
-"redstone" events natively — fires once per actual signal change, so
-holding a lever doesn't spam repeat calls.
+turtle starts). Scales fine to hundreds of entries with no redesign
+needed; `findFloor()`'s linear scan is trivial even at that size.
 
 **Chat commands:** `elevator floor <name>`, `elevator floors`,
-`elevator status`, `elevator resync <name>` (manually correct the
-turtle's tracked position if a move gets interrupted mid-shaft and it
-loses track of which floor it's actually on).
+`elevator status`, `elevator stop`, `elevator start`, `elevator resync
+<name>` (manually correct the turtle's tracked position if it drifts
+from reality).
+
+**`stop`/`start` mid-move:** CC:Tweaked's Lua is cooperatively
+single-threaded, so a blocking move loop can't normally notice a chat
+command arriving mid-transit. Fixed with `parallel.waitForAny` — the
+actual movement and a dedicated stop-listener run concurrently, and
+`elevator stop` ends the listener branch, which the mover checks after
+every single block moved. `elevator start` resumes toward wherever it
+was headed, recalculating remaining distance from the turtle's current
+position rather than assuming it's still where it started.
 
 **Auto-start on boot:** save this file's contents as `startup` on the
 turtle (`copy elevator startup` if it's already saved under a different
-name), then `reboot`. It'll launch and start listening for both chat and
-redstone calls immediately — no manual `elevator` run needed after a
-server restart or the turtle unloading/reloading.
+name), then `reboot`. It'll launch and start listening immediately — no
+manual `elevator` run needed after a server restart or the turtle
+unloading/reloading.
 
 ---
 
