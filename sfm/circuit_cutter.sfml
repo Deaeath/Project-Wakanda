@@ -12,9 +12,13 @@ NAME "Circuit Cutter"
 -- all alias to the same forge_energy resource type). A literal
 -- "forge:energy" is NOT the same thing: that's parsed as an item lookup
 -- for a (nonexistent) item named forge:energy and silently moves nothing.
+-- TOP SIDE targets a specific face for the energy capability read/write --
+-- change to whichever face you actually wired for power on the Battery
+-- and each Slicer (see slots_and_sides.sfml in SFM's bundled examples
+-- for the "<label> <direction> side" syntax).
 EVERY 1 TICKS DO
-    INPUT FROM Battery
-    OUTPUT fe:: TO EACH Slicer
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Slicer TOP SIDE
     FORGET
 END
 

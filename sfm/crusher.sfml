@@ -29,7 +29,7 @@ NAME "Crusher"
 -- is NOT the same thing: that's parsed as an item lookup for a
 -- (nonexistent) item named forge:energy and silently moves nothing.
 EVERY 1 TICKS DO
-    INPUT FROM Battery
+    INPUT FROM Battery TOP SIDE
     OUTPUT fe:: TO EACH Crusher TOP SIDE
     FORGET
 END
