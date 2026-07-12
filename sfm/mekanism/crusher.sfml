@@ -28,8 +28,14 @@ NAME "Crusher"
 -- alias to the same forge_energy resource type). A literal "forge:energy"
 -- is NOT the same thing: that's parsed as an item lookup for a
 -- (nonexistent) item named forge:energy and silently moves nothing.
+-- EVERY 1 TICKS is valid here: a trigger with ONLY forge-energy I/O
+-- statements gets a lower minimum interval (default 1 tick) than the
+-- general 20-tick minimum -- see crystal_assembler.sfml for the full
+-- SFMServerConfig bytecode citation. Requires the resource literal on
+-- BOTH sides (INPUT fe:: FROM ..., not bare INPUT FROM ...) or the
+-- block silently reverts to the 20-tick item-default minimum.
 EVERY 1 TICKS DO
-    INPUT FROM Battery TOP SIDE
+    INPUT fe:: FROM Battery TOP SIDE
     OUTPUT fe:: TO EACH Crusher TOP SIDE
     FORGET
 END

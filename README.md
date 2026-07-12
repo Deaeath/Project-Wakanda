@@ -96,9 +96,17 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
 - Energy is a scalar SFM resource type — the literal `fe::` expands to
   `sfm:fe:*:*`, and `fe`/`rf`/`energy`/`power` all alias to the same
   underlying `forge_energy` type. Moved every tick from `Battery` to
-  every `Assembler`, same `INPUT`/`OUTPUT` syntax as items. **`forge:energy`
-  is a trap** — that gets parsed as an item lookup and silently moves
-  nothing (see [Lessons paid for in blood](#lessons-paid-for-in-blood)).
+  every `Assembler`. **Two traps found the hard way, both confirmed
+  against `SFMServerConfig`'s bytecode:** `forge:energy` isn't the
+  resource — that parses as an item lookup and silently moves nothing —
+  and a bare `INPUT FROM Battery` with no resource literal defaults to
+  `sfm:item:*:*`. That second one matters twice over: it pulls *items*
+  instead of energy, **and** it disqualifies the trigger block from
+  SFM's lower "forge-energy-only" minimum interval (default 1 tick),
+  falling back to the general minimum (default 20 ticks) instead — which
+  is why `EVERY 1 TICKS` gets rejected with "Minimum trigger interval is
+  20 ticks" until the resource literal is explicit on *both* sides:
+  `INPUT fe:: FROM Battery` / `OUTPUT fe:: TO EACH X`.
 - Recipes needing fluids (budding, entro_ingot, fluix_transformation,
   redstone_crystal, sky_bronze/steel/osmium) need water or lava piped in
   separately — SFM doesn't move fluids in this program.
