@@ -19,18 +19,18 @@
 --     upgrade, not adjacent block).
 --   - Fuel: any standard turtle fuel item in its inventory.
 --
--- Configure FLOORS below. "height" can be any consistent number -- real
--- world Y-coordinates work fine, only the DIFFERENCE between two floors
--- matters (see the README's note on relative vs exact). Using actual Y
--- levels here: Y11 and Y44.
+-- Configure FLOORS below. "height" is blocks from the BOTTOM of the
+-- shaft (where the turtle starts), not a world Y-coordinate -- only the
+-- DIFFERENCE between two floors matters, and world Y11 to Y44 is a 33
+-- block gap, so "lower" is 0 and "upper" is 33.
 --
--- IMPORTANT: the turtle must actually be sitting at the Y11 entry's
+-- IMPORTANT: the turtle must actually be sitting at the "lower" (Y11)
 -- position when this script starts, since currentFloorIndex defaults to
--- FLOORS[1] with no GPS to verify it. If the turtle starts at Y44
--- instead, swap the order of these two entries.
+-- FLOORS[1] with no GPS to verify it. If the turtle starts at the upper
+-- floor instead, swap the order of these two entries.
 local FLOORS = {
-    { name = "lower", height = 11 },
-    { name = "upper", height = 44 },
+    { name = "lower", height = 0 },
+    { name = "upper", height = 33 },
 }
 
 local NAME = "ELEVATOR"
