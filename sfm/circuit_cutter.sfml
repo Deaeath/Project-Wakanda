@@ -5,6 +5,18 @@ NAME "Circuit Cutter"
 --   Barrel  => input chest/barrel with all block ingredients
 --   Slicer  => all Circuit Cutter machines (each configured to its own recipe)
 --   Storage => output storage
+--   Battery => power source (capacitor bank, energy cell, etc) feeding the cutters
+
+-- Keep every Circuit Cutter topped up. Energy is a scalar resource type
+-- in SFM -- "fe::" expands to sfm:fe:*:* (any FE/RF/energy/power literal
+-- all alias to the same forge_energy resource type). A literal
+-- "forge:energy" is NOT the same thing: that's parsed as an item lookup
+-- for a (nonexistent) item named forge:energy and silently moves nothing.
+EVERY 1 TICKS DO
+    INPUT FROM Battery
+    OUTPUT fe:: TO EACH Slicer
+    FORGET
+END
 
 EVERY REDSTONE PULSE DO
 

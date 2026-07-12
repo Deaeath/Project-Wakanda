@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="banner.webp" alt="ColossusCraft: Project-Wakanda" />
+<img src="banner.webp" alt="ColossusCraft: Project Wakanda" />
 
-# ColossusCraft: Project-Wakanda
+# ColossusCraft: Project Wakanda
 
 ### *Wakanda Forever. The base runs itself now.*
 
@@ -38,20 +38,27 @@ matters.
 
 ## Systems Roster
 
+```
+project-wakanda/
+├── sfm/            Super Factory Manager programs (.sfml)
+├── cc-tweaked/      CC:Tweaked turtle/computer programs (.lua)
+└── tools/           Local Windows helper tools (.ps1 / .bat)
+```
+
 | Callsign | File | Role |
 |----------|------|------|
-| **Forge** | [`crystal_assembler.sfml`](#crystal_assemblersfml) | ExtendedAE Crystal Assembler automation + self-feeding power |
-| **Cutter** | [`circuit_cutter.sfml`](#circuit_cuttersfml) | ExtendedAE Circuit Cutter automation |
-| **Chamber** | [`reaction_chamber.sfml`](#reaction_chambersfml) | AdvancedAE Reaction Chamber automation |
-| **Crusher** | [`crusher.sfml`](#crushersfml) | Mekanism Crusher — every crushing recipe in the pack |
-| **Jarvis** | [`jarvis.lua`](#jarvislua) | Base assistant — chat commands, alarms, live dashboard |
-| **Griot** | [`status.lua`](#statuslua) | On-demand diagnostic report for any turtle or computer |
-| **Scribe** | [`paste.lua`](#pastelua) | In-game paste receiver, for when `edit` chokes |
-| **Kimoyo** | [`type-into-mc.ps1`](#type-into-mcps1--type-clipboardbat) | Local clipboard-to-game injector |
+| **Forge** | [`sfm/crystal_assembler.sfml`](#sfmcrystal_assemblersfml) | ExtendedAE Crystal Assembler automation + self-feeding power |
+| **Cutter** | [`sfm/circuit_cutter.sfml`](#sfmcircuit_cuttersfml) | ExtendedAE Circuit Cutter automation + self-feeding power |
+| **Chamber** | [`sfm/reaction_chamber.sfml`](#sfmreaction_chambersfml) | AdvancedAE Reaction Chamber automation + self-feeding power |
+| **Crusher** | [`sfm/crusher.sfml`](#sfmcrushersfml) | Mekanism Crusher — every crushing recipe in the pack + self-feeding power |
+| **Jarvis** | [`cc-tweaked/jarvis.lua`](#cc-tweakedjarvislua) | Base assistant — chat commands, alarms, live dashboard |
+| **Griot** | [`cc-tweaked/status.lua`](#cc-tweakedstatuslua) | On-demand diagnostic report for any turtle or computer |
+| **Scribe** | [`cc-tweaked/paste.lua`](#cc-tweakedpastelua) | In-game paste receiver, for when `edit` chokes |
+| **Kimoyo** | [`tools/type-into-mc.ps1`](#toolstype-into-mcps1--type-clipboardbat) | Local clipboard-to-game injector |
 
 ---
 
-## `crystal_assembler.sfml`
+## `sfm/crystal_assembler.sfml`
 
 Automates every ExtendedAE Crystal Assembler recipe **and** keeps the
 assemblers powered — no more walking over to babysit an empty energy buffer.
@@ -66,9 +73,12 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
 | `Battery` | Power source (capacitor bank, energy cell, etc) |
 
 **Notes:**
-- Energy is just another SFM resource type (`forge:energy`) — moved every
-  20 ticks from `Battery` to every `Assembler`, same `INPUT`/`OUTPUT`
-  syntax as items. No dedicated `POWER` keyword exists in SFM.
+- Energy is a scalar SFM resource type — the literal `fe::` expands to
+  `sfm:fe:*:*`, and `fe`/`rf`/`energy`/`power` all alias to the same
+  underlying `forge_energy` type. Moved every tick from `Battery` to
+  every `Assembler`, same `INPUT`/`OUTPUT` syntax as items. **`forge:energy`
+  is a trap** — that gets parsed as an item lookup and silently moves
+  nothing (see [Lessons paid for in blood](#lessons-paid-for-in-blood)).
 - Recipes needing fluids (budding, entro_ingot, fluix_transformation,
   redstone_crystal, sky_bronze/steel/osmium) need water or lava piped in
   separately — SFM doesn't move fluids in this program.
@@ -76,9 +86,10 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
 
 ---
 
-## `circuit_cutter.sfml`
+## `sfm/circuit_cutter.sfml`
 
-Automates the ExtendedAE Circuit Cutter — one cutter per recipe.
+Automates the ExtendedAE Circuit Cutter — one cutter per recipe — and
+keeps every cutter powered.
 
 **Labels to assign:**
 
@@ -87,19 +98,22 @@ Automates the ExtendedAE Circuit Cutter — one cutter per recipe.
 | `Barrel` | Input chest/barrel with block ingredients |
 | `Slicer` | All Circuit Cutter machines (each self-configured to its recipe) |
 | `Storage` | Output storage |
+| `Battery` | Power source (capacitor bank, energy cell, etc) |
 
 **Notes:**
 - All cutters share the single `Slicer` label; each machine self-selects
   its configured recipe.
 - Input slot is `SLOTS 0`, output slot is `SLOTS 1`.
 - Uncomment the megacells/appflux lines if those mods are present.
+- Power feed runs every tick, `Battery` → every `Slicer`, using `fe::`
+  (see the energy note above — `forge:energy` does not work).
 
 ---
 
-## `reaction_chamber.sfml`
+## `sfm/reaction_chamber.sfml`
 
 Automates the AdvancedAE Reaction Chamber across both its water and lava
-recipe families, plus fluid output draining.
+recipe families, plus fluid output draining and power.
 
 **Labels to assign:**
 
@@ -111,20 +125,23 @@ recipe families, plus fluid output draining.
 | `Chamber` | All Reaction Chamber machines |
 | `Storage` | Output chest for items |
 | `FluidStorage` | Output tank for `quantum_infusion_source` fluid |
+| `Battery` | Power source (capacitor bank, energy cell, etc) |
 
 **Notes:**
 - Water and lava recipe blocks run as separate `FORGET`-delimited passes
   in the same trigger, since a Chamber can only hold one fluid at a time.
 - The quantum infusion recipe outputs a fluid, not an item — drained
   separately at the bottom into `FluidStorage`.
+- Power feed runs every tick, `Battery` → every `Chamber`, using `fe::`.
 
 ---
 
-## `crusher.sfml`
+## `sfm/crusher.sfml`
 
 Covers **every crushing recipe registered by any mod in the pack** —
 addons add recipes to Mekanism's own crushing recipe type rather than
 shipping their own crusher block, so one program covers all of them.
+Also keeps every crusher powered.
 
 **Labels to assign:**
 
@@ -133,6 +150,7 @@ shipping their own crusher block, so one program covers all of them.
 | `Barrel` | Input chest/barrel with all raw materials |
 | `Crusher` | All Mekanism Crusher machines |
 | `Storage` | Output storage |
+| `Battery` | Power source (capacitor bank, energy cell, etc) |
 
 **Notes:**
 - Single input/single output machine — no `RETAIN` combos needed, just
@@ -140,10 +158,21 @@ shipping their own crusher block, so one program covers all of them.
 - Covers tag-based inputs (ingots, clumps, gems, ores), the waxed copper
   family via wildcard match, and every literal stone-cycle/organic chain
   in the modpack (deeperdarker, biomeswevegone, biomesoplenty, vanilla).
+- Power feed runs every tick, `Battery` → every `Crusher`, using `fe::`.
+
+> **Mekanism gotcha:** unlike the AE2/ExtendedAE machines above, Mekanism
+> blocks expose **per-face IO configuration** — the colored side config
+> screen, opened by right-clicking the machine with the Configurator. A
+> face that isn't explicitly set to accept Energy won't receive power
+> even though the block has the capability and even if a cable/manager
+> is physically touching it. Before the power feed does anything: open
+> each Crusher's side config, set at least one face to accept Energy
+> (red by default), and point your SFM energy cable/manager at that
+> specific face.
 
 ---
 
-## `jarvis.lua`
+## `cc-tweaked/jarvis.lua`
 
 A CC:Tweaked base assistant. Auto-detects whichever Advanced Peripherals
 are attached and activates matching features — nothing crashes if a
@@ -180,7 +209,7 @@ peripheral is missing, it just quietly disables that feature.
 
 ---
 
-## `status.lua`
+## `cc-tweaked/status.lua`
 
 One-shot diagnostic dump. Prints everything it can find; missing
 peripherals or features just print "not present" instead of erroring —
@@ -195,7 +224,7 @@ Run with: `status`
 
 ---
 
-## `paste.lua`
+## `cc-tweaked/paste.lua`
 
 A line-buffered paste receiver for the turtle terminal. CC:Tweaked's
 built-in `edit` can choke on large pastes or drop characters under load;
@@ -209,7 +238,7 @@ Type or paste your code, then end with a line containing only `:done`.
 
 ---
 
-## `type-into-mc.ps1` / `type-clipboard.bat`
+## `tools/type-into-mc.ps1` / `type-clipboard.bat`
 
 The nuclear option: when in-game paste isn't reliable and typing 300+
 lines by hand isn't happening, this reads your **clipboard** on the
@@ -217,7 +246,7 @@ Windows side and injects it into whatever window has focus, character by
 character, as fast as your CPU can push `SendInput` calls.
 
 ```
-powershell -File .\sfm-programs\type-into-mc.ps1
+powershell -File .\tools\type-into-mc.ps1
 ```
 
 or double-click `type-clipboard.bat` / use the pinned shortcut.
@@ -245,9 +274,27 @@ or double-click `type-clipboard.bat` / use the pinned shortcut.
 
 ## Lessons paid for in blood
 
-- **SFM has no `POWER` keyword.** Energy is just a resource type
-  (`forge:energy`) moved with ordinary `INPUT`/`OUTPUT` statements, same
-  as items.
+- **SFM has no `POWER` keyword, and `forge:energy` is not the energy
+  resource.** Energy is a *scalar* resource type, referenced with the
+  literal `fe::` (or `rf::`/`energy::`/`power::` — all four alias to the
+  same `forge_energy` type internally). Writing `forge:energy` instead
+  parses as an item lookup for a nonexistent item and silently moves
+  nothing — no error, it just never fires. Confirmed against the
+  bundled `resource_types.sfml` template and the parser bytecode
+  (`ResourceIdentifier`'s constructor literally special-cases
+  `["fe","rf","energy","power"]`).
+- **`OUTPUT ALL <resource> TO ...` isn't valid grammar.** `ALL` expects
+  `TO` or `EXCEPT` immediately after it — the in-game parser error is
+  `mismatched input '<resource>' expecting {TO, EXCEPT}`. To move every
+  unit of a resource, just omit `ALL` entirely: the `::` wildcard in
+  `fe::`/`fluid::` already means "everything of this type."
+- **Mekanism machines need an explicit side qualifier for energy.**
+  Unlike AE2/ExtendedAE blocks, Mekanism's per-face IO config means a
+  cable/manager touching an unconfigured face won't deliver power even
+  though the capability exists. SFM supports targeting a specific face
+  directly — `<label> <direction> side` right after the label (see the
+  bundled `slots_and_sides.sfml` template) — and it has to match
+  whichever face you set to accept Energy in Mekanism's Configurator.
 - **Advanced Peripherals types are snake_case**, not camelCase — always
   verify against the mod jar (`javap` the `PERIPHERAL_TYPE` constant)
   before trusting a peripheral name.

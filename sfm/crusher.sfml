@@ -10,6 +10,29 @@ NAME "Crusher"
 --   Barrel  => input chest/barrel with all raw materials
 --   Crusher => all Mekanism Crusher machines
 --   Storage => output storage
+--   Battery => power source (capacitor bank, energy cell, etc) feeding the crushers
+--
+-- MEKANISM GOTCHA: unlike the AE2/ExtendedAE machines in this pack,
+-- Mekanism blocks expose per-face IO configuration (the colored side
+-- config screen, opened by right-clicking the machine with the
+-- Configurator). A face that isn't configured to accept energy will not
+-- receive power even though the block has the capability. SFM lets you
+-- target a specific face directly with a side qualifier (see the
+-- bundled "Slots and sides" example program): "<label> <direction> side"
+-- placed right after the label. Below assumes you configured the TOP
+-- face of every Crusher as the Energy input (red) -- change "top" to
+-- whichever face you actually set in-game.
+
+-- Keep every Crusher topped up. Energy is a scalar resource type in SFM
+-- -- "fe::" expands to sfm:fe:*:* (any FE/RF/energy/power literal all
+-- alias to the same forge_energy resource type). A literal "forge:energy"
+-- is NOT the same thing: that's parsed as an item lookup for a
+-- (nonexistent) item named forge:energy and silently moves nothing.
+EVERY 1 TICKS DO
+    INPUT FROM Battery
+    OUTPUT fe:: TO EACH Crusher TOP SIDE
+    FORGET
+END
 
 EVERY REDSTONE PULSE DO
 

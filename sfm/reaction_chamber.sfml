@@ -8,6 +8,18 @@ NAME "Reaction Chamber"
 --   Chamber      => all Reaction Chamber machines
 --   Storage      => output chest for items
 --   FluidStorage => output tank for quantum_infusion_source fluid
+--   Battery      => power source (capacitor bank, energy cell, etc) feeding the chambers
+
+-- Keep every Reaction Chamber topped up. Energy is a scalar resource type
+-- in SFM -- "fe::" expands to sfm:fe:*:* (any FE/RF/energy/power literal
+-- all alias to the same forge_energy resource type). A literal
+-- "forge:energy" is NOT the same thing: that's parsed as an item lookup
+-- for a (nonexistent) item named forge:energy and silently moves nothing.
+EVERY 1 TICKS DO
+    INPUT FROM Battery
+    OUTPUT fe:: TO EACH Chamber
+    FORGET
+END
 
 EVERY REDSTONE PULSE DO
 
