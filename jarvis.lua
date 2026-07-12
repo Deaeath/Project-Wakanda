@@ -1,15 +1,15 @@
--- JARVIS: base assistant for CC:Tweaked (CraftOS 1.9 / CC 1.120.0, MC 1.21.1)
+-- JARVIS: base assistant for CC:Tweaked (CraftOS 1.9, CC 1.120.0, MC 1.21.1)
 -- Auto-detects whichever Advanced Peripherals are attached and activates
 -- matching features. Missing a peripheral just disables that feature --
 -- nothing crashes.
 --
--- Supported peripherals (attach any/all, wired or wireless):
+-- Supported peripherals (attach any or all, wired or wireless):
 --   Chat Box            -> talk back in-game, listen for "jarvis <cmd>"
---   ME Bridge/RS Bridge  -> AE2/RS storage + item lookups
+--   ME Bridge or RS Bridge -> AE2 or RS storage + item lookups
 --   Player Detector     -> greet you on arrival, warn on stranger nearby
---   Energy Detector     -> report/alert on FE flow
+--   Energy Detector     -> report or alert on FE flow
 --
--- Install: place this file as "startup" on the turtle/computer (or run
+-- Install: place this file as "startup" on the turtle or computer (or run
 -- `edit startup` and paste this in), or run it directly with `jarvis`.
 
 local NAME = "J.A.R.V.I.S."
@@ -18,7 +18,7 @@ local HIGH_STORAGE_THRESHOLD = 0.95 -- warn above 95% ME storage used
 local GREETING_RANGE = 12
 local INTRUDER_RANGE = 24           -- wider net for unknown-player detection
 local POLL_INTERVAL = 5             -- seconds between background checks
-local ALARM_SIDE = "back"           -- redstone output side for the siren/alarm
+local ALARM_SIDE = "back"           -- redstone output side for the siren or alarm
 local ALARM_PULSE_TICKS = 1.0       -- seconds the alarm redstone line stays high
 
 -- Anyone NOT in this list triggers the intruder alarm when seen nearby.
@@ -30,10 +30,10 @@ local TRUSTED_PLAYERS = {
 
 -- ===== Peripheral discovery =====
 
-local chat = peripheral.find("chatBox")
-local storage = peripheral.find("meBridge") or peripheral.find("rsBridge")
-local playerDetect = peripheral.find("playerDetector")
-local energyDetect = peripheral.find("energyDetector")
+local chat = peripheral.find("chat_box")
+local storage = peripheral.find("me_bridge") or peripheral.find("rs_bridge")
+local playerDetect = peripheral.find("player_detector")
+local energyDetect = peripheral.find("energy_detector")
 local speaker = peripheral.find("speaker")
 local monitor = peripheral.find("monitor")
 
@@ -61,7 +61,7 @@ end
 
 -- ===== Redstone alarm =====
 -- Pulses are timed via the main event loop's timer dispatch (see bottom),
--- not os.sleep, so triggering an alarm never blocks chat/detector handling.
+-- not os.sleep, so triggering an alarm never blocks chat or detector handling.
 
 local alarmTimer = nil
 
@@ -76,7 +76,7 @@ end
 
 local function reportStorage()
     if not storage then
-        say("No ME/RS bridge attached, can't check storage.")
+        say("No ME or RS bridge attached, can't check storage.")
         return
     end
     local ok, items = pcall(storage.listItems)
@@ -123,14 +123,14 @@ local function reportEnergy()
     local ok, stored = pcall(energyDetect.getEnergy)
     local ok2, capacity = pcall(energyDetect.getMaxEnergy)
     if ok and ok2 and capacity and capacity > 0 then
-        local pct = math.floor((stored / capacity) * 100)
-        say(("Power reserves at %d%% (%d / %d FE)."):format(pct, stored, capacity))
+        local pct = math.floor((stored * capacity^-1) * 100)
+        say(("Power reserves at %d%% (%d out of %d FE)."):format(pct, stored, capacity))
     else
         say("Energy detector didn't return a reading.")
     end
 end
 
--- ===== Feature: scan / status =====
+-- ===== Feature: scan and status =====
 
 local function fullScan()
     say("Running full diagnostic...")
@@ -166,7 +166,7 @@ local function handleCommand(cmd, sender)
     end
 end
 
--- ===== Shared state (forward-declared so drawDashboard/backgroundCheck,
+-- ===== Shared state (forward-declared so drawDashboard and backgroundCheck,
 -- which are defined before their state is otherwise assigned, close over
 -- the real locals instead of falling through to globals) =====
 
@@ -193,9 +193,9 @@ local function drawDashboard()
             local eok2, capacity = pcall(energyDetect.getMaxEnergy)
             monitor.setCursorPos(1, line)
             if eok and eok2 and capacity and capacity > 0 then
-                local pct = math.floor((stored / capacity) * 100)
+                local pct = math.floor((stored * capacity^-1) * 100)
                 monitor.setTextColor(pct < LOW_ENERGY_THRESHOLD * 100 and colors.red or colors.green)
-                monitor.write(("Power: %d%% (%d / %d FE)"):format(pct, stored, capacity))
+                monitor.write(("Power: %d%% (%d out of %d FE)"):format(pct, stored, capacity))
             else
                 monitor.write("Power: no reading")
             end
@@ -283,9 +283,9 @@ local function backgroundCheck()
         local ok, stored = pcall(energyDetect.getEnergy)
         local ok2, capacity = pcall(energyDetect.getMaxEnergy)
         if ok and ok2 and capacity and capacity > 0 then
-            if (stored / capacity) < LOW_ENERGY_THRESHOLD then
+            if (stored * capacity^-1) < LOW_ENERGY_THRESHOLD then
                 say("Warning: power reserves critical, " ..
-                    math.floor((stored / capacity) * 100) .. "% remaining.")
+                    math.floor((stored * capacity^-1) * 100) .. "% remaining.")
                 chime("bass", 6)
             end
         end

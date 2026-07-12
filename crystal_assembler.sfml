@@ -6,6 +6,16 @@ NAME "Crystal Assembler"
 --   Barrel    => input chest/barrel with all ingredients
 --   Assembler => all Crystal Assembler machines
 --   Storage   => output storage
+--   Battery   => power source (capacitor bank, energy cell, etc) feeding the assemblers
+
+-- Keep every Crystal Assembler topped up. Energy is just another resource
+-- type in SFM (id forge:energy), moved with the same INPUT/OUTPUT syntax
+-- as items -- no dedicated "power" keyword exists.
+EVERY 20 TICKS DO
+    INPUT FROM Battery
+    OUTPUT ALL forge:energy TO EACH Assembler
+    FORGET
+END
 
 EVERY REDSTONE PULSE DO
 
