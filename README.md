@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="banner.webp" alt="Project-Wakanda" width="260" />
+<img src="banner.webp" alt="Project-Wakanda" />
 
 # Project-Wakanda
 
