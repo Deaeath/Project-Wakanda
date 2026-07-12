@@ -13,7 +13,10 @@ EVERY REDSTONE PULSE DO
 
     -- === WATER RECIPES ===
     INPUT FROM Barrel
-    INPUT fluid::minecraft:water FROM WaterTank
+    INPUT fluid:minecraft:water FROM WaterTank
+
+    -- certuscharger: 64x certus_quartz_crystal + 1000mb water → 64x charged_certus_quartz_crystal
+    OUTPUT RETAIN 64 ae2:certus_quartz_crystal TO EACH Chamber
 
     -- fluixcrystalfromdust: 32x charged_certus + 32x fluix_dust + 500mb water
     OUTPUT RETAIN 32 ae2:charged_certus_quartz_crystal,
@@ -52,13 +55,13 @@ EVERY REDSTONE PULSE DO
     OUTPUT RETAIN 1 advanced_ae:quantum_infused_dust TO EACH Chamber
 
     -- 4000mb covers quantum_infusion; all other water recipes use 500mb
-    OUTPUT RETAIN 4000 fluid::minecraft:water TO EACH Chamber
+    OUTPUT RETAIN 4000 fluid:minecraft:water TO EACH Chamber
 
     FORGET
 
     -- === LAVA RECIPES ===
     INPUT FROM Barrel
-    INPUT fluid::minecraft:lava FROM LavaTank
+    INPUT fluid:minecraft:lava FROM LavaTank
 
     -- singularity: 64x matter_ball + 100mb lava
     OUTPUT RETAIN 64 ae2:matter_ball TO EACH Chamber
@@ -77,18 +80,19 @@ EVERY REDSTONE PULSE DO
            RETAIN 16 WITH #c:ingots/osmium
     TO EACH Chamber
 
-    OUTPUT RETAIN 500 fluid::minecraft:lava TO EACH Chamber
+    OUTPUT RETAIN 500 fluid:minecraft:lava TO EACH Chamber
 
     FORGET
 
     -- === DRAIN ===
-    INPUT FROM EACH Chamber
+    -- Slots 0-8 are input slots (INSERT_ONLY); slot 9 is the single output slot (EXTRACT_ONLY)
+    INPUT FROM EACH Chamber SLOTS 9
     OUTPUT TO EMPTY SLOTS IN Storage
 
     FORGET
 
     -- quantum_infusion_source is a fluid output, drain separately
-    INPUT fluid::advanced_ae:quantum_infusion_source FROM EACH Chamber
-    OUTPUT fluid:: TO FluidStorage
+    INPUT fluid:advanced_ae:quantum_infusion_source FROM EACH Chamber
+    OUTPUT fluid:advanced_ae:quantum_infusion_source TO FluidStorage
 
 END

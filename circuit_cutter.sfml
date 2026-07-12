@@ -14,7 +14,10 @@ EVERY REDSTONE PULSE DO
     OUTPUT RETAIN 1 WITH #c:storage_blocks/gold     TO EACH Slicer SLOTS 0
     OUTPUT RETAIN 1 WITH #c:storage_blocks/diamond  TO EACH Slicer SLOTS 0
     OUTPUT RETAIN 1 WITH #c:storage_blocks/silicon  TO EACH Slicer SLOTS 0
-    OUTPUT RETAIN 1 extendedae:entro_block          TO EACH Slicer SLOTS 0
+    OUTPUT RETAIN 1 WITH #c:storage_blocks/entro    TO EACH Slicer SLOTS 0
+
+    -- AdvancedAE quantum processor print (requires extendedae loaded, which it is here)
+    OUTPUT RETAIN 1 advanced_ae:quantum_alloy_block TO EACH Slicer SLOTS 0
 
     -- Uncomment if you have megacells installed:
     -- OUTPUT RETAIN 1 megacells:sky_steel_block       TO EACH Slicer SLOTS 0

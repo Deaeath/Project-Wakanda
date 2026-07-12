@@ -24,18 +24,13 @@ Automates all ExtendedAE Crystal Assembler recipes.
 Automates the ExtendedAE Circuit Cutter (one cutter per recipe).
 
 **Labels to assign:**
-| Label | Block | Produces |
-|-------|-------|----------|
-| `Barrel` | Input chest/barrel | — |
-| `SlicerCalc` | Circuit Cutter | printed_calculation_processor |
-| `SlicerLogic` | Circuit Cutter | printed_logic_processor |
-| `SlicerEng` | Circuit Cutter | printed_engineering_processor |
-| `SlicerSi` | Circuit Cutter | printed_silicon |
-| `SlicerConc` | Circuit Cutter | concurrent_processor_print |
-| `SlicerAccum` | Circuit Cutter | printed_accumulation_processor *(megacells)* |
-| `SlicerEnergy` | Circuit Cutter | printed_energy_processor *(appflux)* |
-| `Storage` | Output storage | — |
+| Label | Block |
+|-------|-------|
+| `Barrel` | Input chest/barrel with block ingredients |
+| `Slicer` | All Circuit Cutter machines (each configured to its own recipe) |
+| `Storage` | Output storage |
 
 **Notes:**
+- All cutters share the single `Slicer` label; each machine self-selects its configured recipe
 - Input slot is SLOTS 0, output slot is SLOTS 1
 - Uncomment the megacells/appflux lines in the program if those mods are present

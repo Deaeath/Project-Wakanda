@@ -1,0 +1,424 @@
+NAME "Crusher"
+
+-- Mekanism Crusher automation (mekanism:crushing recipe type)
+-- Covers every crushing recipe registered by any mod in the pack, since
+-- addon mods add recipes to Mekanism's own recipe type rather than adding
+-- their own crusher block. The Crusher is a single-input/single-output
+-- machine, so unlike the Reaction Chamber there's no RETAIN combo needed --
+-- just keep every valid input material stocked and drain the result.
+-- Labels needed:
+--   Barrel  => input chest/barrel with all raw materials
+--   Crusher => all Mekanism Crusher machines
+--   Storage => output storage
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+
+    -- === TAG-BASED INPUTS ===
+    OUTPUT RETAIN 64 WITH #c:clumps/allthemodium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/unobtainium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/vibranium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/allthemodium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/unobtainium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/vibranium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/aluminum TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/copper TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/gold TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/iridium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/iron TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/lead TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/nickel TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/osmium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/platinum TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/silver TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/tin TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/uranium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:clumps/zinc TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/cinnabar TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/diamond TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/fluorite TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/peridot TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/ruby TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/sapphire TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/aluminum TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/brass TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/bronze TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/constantan TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/copper TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/electrum TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/enderium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/gold TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/invar TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/iridium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/iron TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/lead TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/lumium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/netherite TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/nickel TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/osmium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/platinum TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/signalum TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/silver TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/steel TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/tin TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/uranium TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/zinc TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/entro TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #biomeswevegone:black_sandstone_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #biomeswevegone:blue_sandstone_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #biomeswevegone:pink_sandstone_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #biomeswevegone:purple_sandstone_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #biomeswevegone:white_sandstone_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #biomeswevegone:windswept_sandstone_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:cobblestones/normal TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/melon TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/pumpkin TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/sugar_cane TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:foods/berry TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/certus_quartz TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/emerald TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/lapis TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gems/quartz TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:gravels TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/refined_glowstone TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ingots/refined_obsidian TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:mushrooms TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:obsidians/normal TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:ores/netherite_scrap TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:rods/blaze TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:rods/breeze TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:sands TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:sandstone/red_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:sandstone/uncolored_blocks TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:seeds TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:storage_blocks/dried_kelp TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:storage_blocks/wheat TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #minecraft:leaves TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #minecraft:saplings TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #minecraft:small_flowers TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #minecraft:tall_flowers TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #minecraft:wool TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/carrot TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/cactus TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/potato TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/wheat TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/beetroot TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/nether_wart TO EACH Crusher
+    OUTPUT RETAIN 64 WITH #c:crops/cocoa_bean TO EACH Crusher
+
+    -- === WAXED COPPER FAMILY (all oxidation stages, blocks/doors/grates/etc) ===
+    OUTPUT RETAIN 64 EACH *waxed_* TO EACH Crusher
+
+    -- === LITERAL ITEM INPUTS ===
+    OUTPUT RETAIN 64 actuallyadditions:black_quartz_block TO EACH Crusher
+    OUTPUT RETAIN 64 advanced_ae:shattered_singularity TO EACH Crusher
+    OUTPUT RETAIN 64 allthetweaks:atm_star TO EACH Crusher
+
+    -- deeperdarker gloomslate/sculk_stone stone-cycle chain
+    OUTPUT RETAIN 64 deeperdarker:chiseled_gloomslate TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:chiseled_sculk_stone TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_gloomslate TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_gloomslate_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_gloomslate_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_gloomslate_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_sculk_stone TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_sculk_stone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_sculk_stone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:cut_sculk_stone_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_tile_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_tile_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_tile_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:gloomslate_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_gloomslate TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_gloomslate_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_gloomslate_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_gloomslate_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_sculk_stone TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_sculk_stone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_sculk_stone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:polished_sculk_stone_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_tile_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_tile_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_tile_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:sculk_stone_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_gloomslate TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_gloomslate_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_gloomslate_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_gloomslate_wall TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_sculk_stone TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_sculk_stone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_sculk_stone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 deeperdarker:smooth_sculk_stone_wall TO EACH Crusher
+
+    -- ae2 quartz/sky stone chains
+    OUTPUT RETAIN 64 ae2:chiseled_quartz_block TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:chiseled_quartz_slab TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:chiseled_quartz_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:chiseled_quartz_wall TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:fluix_crystal TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_block TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_pillar TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_pillar_slab TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_pillar_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_pillar_wall TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_slab TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:quartz_wall TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_block TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_brick TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_small_brick TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_small_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_small_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:sky_stone_small_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:smooth_sky_stone_block TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:smooth_sky_stone_chest TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:smooth_sky_stone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:smooth_sky_stone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 ae2:smooth_sky_stone_wall TO EACH Crusher
+
+    -- biomeswevegone dacite/red_rock/white_dacite stone-cycle chains
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_dacite_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_dacite_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_dacite_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_dacite_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_red_rock_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_red_rock_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_red_rock_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_red_rock_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_white_dacite_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_white_dacite_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_white_dacite_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:chiseled_white_dacite_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_dacite_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_dacite_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_dacite_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_dacite_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_red_rock_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_red_rock_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_red_rock_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_red_rock_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_white_dacite_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_white_dacite_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_white_dacite_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:cracked_white_dacite_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_cobblestone TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_cobblestone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_cobblestone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_cobblestone_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_pillar TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_tile_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_tile_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_tile_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:dacite_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:polished_red_rock TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:polished_red_rock_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:polished_red_rock_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:polished_red_rock_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_tile_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_tile_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_tile_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:red_rock_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_cobblestone TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_cobblestone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_cobblestone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_cobblestone_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_pillar TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_tile_slab TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_tile_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_tile_wall TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 biomeswevegone:white_dacite_wall TO EACH Crusher
+
+    -- vanilla minecraft: organics -> bio_fuel, misc drops, and stone-cycle chains
+    OUTPUT RETAIN 64 minecraft:apple TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:baked_potato TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:bamboo TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:big_dripleaf TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:bone TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:bone_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:bread TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:cake TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:carved_pumpkin TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:charcoal TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:chiseled_deepslate TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:chiseled_nether_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:chiseled_polished_blackstone TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:chiseled_quartz_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:chiseled_stone_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:chiseled_tuff TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:coal TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:cookie TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:cracked_deepslate_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:cracked_deepslate_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:cracked_polished_blackstone_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:cracked_stone_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:crimson_roots TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_tile_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_tile_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_tile_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:deepslate_tiles TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:dried_kelp TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:dripstone_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:ender_pearl TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:fern TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:flint TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:glow_lichen TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:hanging_roots TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:honeycomb_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:kelp TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:large_fern TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:lily_pad TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:mangrove_roots TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:melon_slice TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:moss_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:moss_carpet TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:mud_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:music_disc_5 TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:nether_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:nether_sprouts TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:nether_wart_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:pink_petals TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:pitcher_pod TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:poisonous_potato TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_andesite TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_andesite_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_andesite_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_blackstone TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_blackstone_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_blackstone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_blackstone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_blackstone_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_deepslate TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_deepslate_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_deepslate_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_deepslate_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_diorite TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_diorite_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_diorite_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_granite TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_granite_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_granite_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_tuff TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_tuff_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_tuff_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_tuff_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:prismarine_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:pumpkin_pie TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:purpur_pillar TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:quartz_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:quartz_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:quartz_pillar TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:quartz_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:quartz_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:rotten_flesh TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:sea_pickle TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:seagrass TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:short_grass TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:shroomlight TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:small_dripleaf TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:smooth_quartz TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:soul_soil TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:spore_blossom TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:stone TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:stone_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:stone_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:stone_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tall_grass TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_brick_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_brick_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_brick_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_bricks TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_slab TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_stairs TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:tuff_wall TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:warped_roots TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:warped_wart_block TO EACH Crusher
+
+    -- biomesoplenty sandstone family (compound recipes: base/chiseled/cut/smooth all -> sand)
+    OUTPUT RETAIN 64 biomesoplenty:black_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:chiseled_black_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:cut_black_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:smooth_black_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:orange_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:chiseled_orange_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:cut_orange_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:smooth_orange_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:white_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:chiseled_white_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:cut_white_sandstone TO EACH Crusher
+    OUTPUT RETAIN 64 biomesoplenty:smooth_white_sandstone TO EACH Crusher
+
+    -- remaining compound recipes (mushrooms/fungi/vines/basalt -> bio_fuel or basalt)
+    OUTPUT RETAIN 64 minecraft:brown_mushroom_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:red_mushroom_block TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:mushroom_stem TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:crimson_fungus TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:warped_fungus TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:polished_basalt TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:smooth_basalt TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:vine TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:twisting_vines TO EACH Crusher
+    OUTPUT RETAIN 64 minecraft:weeping_vines TO EACH Crusher
+
+    FORGET
+
+    -- Drain finished items to storage (Crusher has a single output slot, same as Assembler)
+    INPUT FROM EACH Crusher SLOTS 1
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
