@@ -1,0 +1,72 @@
+NAME "Enrichment Chamber"
+
+-- Mekanism 5x ore processing, step 7 of 7 (final step): Dirty Dust (item)
+-- -> Dust (item). Dust then smelts directly to an ingot in any furnace.
+-- Source-verified against data/mekanism/recipe/processing/<metal>/dust/from_dirty_dust.json
+-- for all 7 base metals -- identical recipe shape per metal:
+--   1x WITH #c:dirty_dusts/<metal> -> 1x dust_<metal>
+--
+-- This machine also runs the small extra Enrichment Chamber recipe set
+-- from data/mekanism/recipe/enriching/*.json directly (charcoal dust,
+-- clay, glowstone, HDPE sheets, salt, string) plus the "enriched" bonus
+-- ingredients (enriched carbon/diamond/gold/redstone/refined_obsidian/tin,
+-- used by other Mekanism recipes as speed/yield boosters) -- all included
+-- below since they're the same machine and same trigger.
+--
+-- Dirty dust input here is fed by crusher.sfml's crushing step (clump ->
+-- dirty_dust) for the 7 base metals -- point this program's Barrel at
+-- the same storage crusher.sfml drains into.
+--
+-- Labels needed:
+--   Barrel  => input chest/barrel with dirty_dust_<metal> items and the
+--              extra enriching-recipe ingredients listed above
+--   Chamber => all Enrichment Chamber machines
+--   Storage => output storage
+--   Battery => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+
+    -- Base metal dirty dust -> dust (5x ore processing, final step)
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/iron TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/gold TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/copper TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/lead TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/osmium TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/tin TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dirty_dusts/uranium TO EACH Chamber
+
+    -- Extra enriching recipes (data/mekanism/recipe/enriching/*.json)
+    OUTPUT RETAIN 16 WITH #c:dusts/charcoal TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dusts/wood TO EACH Chamber
+    OUTPUT RETAIN 16 minecraft:clay TO EACH Chamber
+    OUTPUT RETAIN 16 minecraft:glowstone TO EACH Chamber
+    OUTPUT RETAIN 16 mekanism:hdpe_pellet TO EACH Chamber
+    OUTPUT RETAIN 16 mekanism:block_salt TO EACH Chamber
+    OUTPUT RETAIN 16 minecraft:cobweb TO EACH Chamber
+
+    -- "Enriched" bonus ingredients (data/mekanism/recipe/enriching/enriched/*.json)
+    OUTPUT RETAIN 16 WITH #minecraft:coals TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:gems/diamond TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dusts/gold TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dusts/redstone TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dusts/refined_obsidian TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:dusts/tin TO EACH Chamber
+
+    FORGET
+
+    -- CAVEAT: item output slot index guessed by pattern, not independently
+    -- verified against this machine's container class -- check in-game
+    -- and adjust if items aren't draining.
+    INPUT FROM EACH Chamber SLOTS 2
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
+
+-- Keep every Enrichment Chamber powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Chamber TOP SIDE
+    FORGET
+END

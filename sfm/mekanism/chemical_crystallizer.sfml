@@ -1,0 +1,39 @@
+NAME "Chemical Crystallizer"
+
+-- Mekanism 5x ore processing, step 3 of 7: Clean Slurry (chemical)
+-- -> Crystal (item).
+-- Source-verified against data/mekanism/recipe/processing/<metal>/crystal/*.json
+-- for all 7 base metals -- identical recipe shape per metal:
+--   200mb clean_<metal> -> 1x crystal_<metal>
+--
+-- Labels needed:
+--   CleanSlurryTank => input tank holding clean_<metal> chemicals (output
+--                      of chemical_washer.sfml's CleanSlurryTank label)
+--   Crystallizer    => all Chemical Crystallizer machines
+--   Storage         => output storage for crystal_<metal> items
+--   Battery         => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT chemical:: FROM CleanSlurryTank
+    OUTPUT chemical:: TO EACH Crystallizer
+
+    FORGET
+
+    -- Crystal items are a normal item output slot -- drain like any
+    -- other single-output machine (matches crusher.sfml's pattern).
+    -- CAVEAT: "SLOTS 1" mirrors crusher.sfml's convention but the exact
+    -- output slot index for this specific machine wasn't independently
+    -- verified against its container class -- check in-game (open the
+    -- Crystallizer GUI) and adjust the number if items aren't draining.
+    INPUT FROM EACH Crystallizer SLOTS 1
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
+
+-- Keep every Crystallizer powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Crystallizer TOP SIDE
+    FORGET
+END

@@ -1,0 +1,45 @@
+NAME "Chemical Injection Chamber"
+
+-- Mekanism 5x ore processing, step 4 of 7: Crystal (item) + Hydrogen
+-- Chloride gas -> Shard (item).
+-- Source-verified against data/mekanism/recipe/processing/<metal>/shard/from_crystal.json
+-- for all 7 base metals -- identical recipe shape per metal:
+--   1x WITH #c:crystals/<metal> + hydrogen_chloride (per-tick) -> 1x shard_<metal>
+--
+-- Labels needed:
+--   Barrel   => input chest/barrel with crystal_<metal> items (from
+--               chemical_crystallizer.sfml's Storage output)
+--   HClTank  => Hydrogen Chloride gas source tank
+--   Chamber  => all Chemical Injection Chamber machines
+--   Storage  => output storage for shard_<metal> items
+--   Battery  => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+    INPUT chemical:mekanism:hydrogen_chloride FROM HClTank
+
+    OUTPUT RETAIN 16 WITH #c:crystals/iron TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:crystals/gold TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:crystals/copper TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:crystals/lead TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:crystals/osmium TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:crystals/tin TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:crystals/uranium TO EACH Chamber
+
+    FORGET
+
+    -- CAVEAT: item output slot index guessed by pattern, not independently
+    -- verified against this machine's container class -- check in-game
+    -- and adjust if items aren't draining.
+    INPUT FROM EACH Chamber SLOTS 2
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
+
+-- Keep every Injection Chamber powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Chamber TOP SIDE
+    FORGET
+END

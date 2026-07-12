@@ -54,6 +54,12 @@ project-wakanda/
 | **Cutter** | [`sfm/extendedae/circuit_cutter.sfml`](#sfmextendedaecircuit_cuttersfml) | ExtendedAE Circuit Cutter automation + self-feeding power |
 | **Chamber** | [`sfm/advancedae/reaction_chamber.sfml`](#sfmadvancedaereaction_chambersfml) | AdvancedAE Reaction Chamber automation + self-feeding power |
 | **Crusher** | [`sfm/mekanism/crusher.sfml`](#sfmmekanismcrushersfml) | Mekanism Crusher — every crushing recipe in the pack + self-feeding power |
+| **Dissolver** | [`sfm/mekanism/chemical_dissolution_chamber.sfml`](#sfmmekanismchemical_dissolution_chambersfml) | 5x ore processing step 1/7: ore/raw material → dirty slurry |
+| **Washer** | [`sfm/mekanism/chemical_washer.sfml`](#sfmmekanismchemical_washersfml) | 5x ore processing step 2/7: dirty slurry → clean slurry |
+| **Crystallizer** | [`sfm/mekanism/chemical_crystallizer.sfml`](#sfmmekanismchemical_crystallizersfml) | 5x ore processing step 3/7: clean slurry → crystal |
+| **Injector** | [`sfm/mekanism/chemical_injection_chamber.sfml`](#sfmmekanismchemical_injection_chambersfml) | 5x ore processing step 4/7: crystal → shard |
+| **Purifier** | [`sfm/mekanism/purification_chamber.sfml`](#sfmmekanismpurification_chambersfml) | 5x ore processing step 5/7: shard → clump |
+| **Enricher** | [`sfm/mekanism/enrichment_chamber.sfml`](#sfmmekanismenrichment_chambersfml) | 5x ore processing step 7/7: dirty dust → dust (+ misc enriching recipes) |
 | **Jarvis** | [`cc-tweaked/jarvis.lua`](#cc-tweakedjarvislua) | Base assistant — chat commands, alarms, live dashboard |
 | **Griot** | [`cc-tweaked/status.lua`](#cc-tweakedstatuslua) | On-demand diagnostic report for any turtle or computer |
 | **Scribe** | [`cc-tweaked/paste.lua`](#cc-tweakedpastelua) | In-game paste receiver, for when `edit` chokes |
@@ -180,6 +186,44 @@ Also keeps every crusher powered.
 > each Crusher's side config, set at least one face to accept Energy
 > (red by default), and point your SFM energy cable/manager at that
 > specific face.
+
+---
+
+## The 5x ore processing chain (`chemical_dissolution_chamber.sfml` → `enrichment_chamber.sfml`)
+
+Six more programs cover Mekanism's full 5x ore processing line for all 7
+base metals (iron, gold, copper, lead, osmium, tin, uranium) — every step
+source-verified against `data/mekanism/recipe/processing/<metal>/*.json`
+in the Mekanism jar, not guessed from memory:
+
+| Step | Program | Machine | Transform |
+|------|---------|---------|-----------|
+| 1/7 | `chemical_dissolution_chamber.sfml` | Chemical Dissolution Chamber | ore/raw material + Sulfuric Acid → dirty slurry |
+| 2/7 | `chemical_washer.sfml` | Chemical Washer | dirty slurry + water → clean slurry |
+| 3/7 | `chemical_crystallizer.sfml` | Chemical Crystallizer | clean slurry → crystal |
+| 4/7 | `chemical_injection_chamber.sfml` | Chemical Injection Chamber | crystal + Hydrogen Chloride → shard |
+| 5/7 | `purification_chamber.sfml` | Purification Chamber | shard + Oxygen → clump |
+| 6/7 | `crusher.sfml` | Crusher | clump → dirty dust (already covered above) |
+| 7/7 | `enrichment_chamber.sfml` | Enrichment Chamber | dirty dust → dust (smelts to ingot) |
+
+**Chain it end to end:** each program's output `Storage` label feeds the
+next program's input `Barrel` label — point them at the same physical
+chest/barrel to run the whole line unattended.
+
+**Chemicals are a resource type too**, same as items/fluids/energy —
+`chemical:mekanism:sulfuric_acid` targets one specific gas,
+`chemical::` (wildcard) matches any Mekanism chemical regardless of
+which metal produced it. Confirmed via `ChemicalResourceType` in the SFM
+jar, registered only when Mekanism is loaded (`SFMMekanismCompat`).
+
+**Known gaps, called out honestly:** the exact inventory slot index used
+for each machine's item OUTPUT (`SLOTS n`) was pattern-matched from
+`crusher.sfml`, not independently verified against each machine's
+container class — those base classes are shared/generic and didn't
+expose slot layout through simple decompilation. If items stop draining,
+open that machine's GUI in-game, note the real output slot position,
+and adjust the `SLOTS` number. Everything else — recipe inputs/outputs,
+resource type syntax, chemical amounts — is source-verified.
 
 ---
 

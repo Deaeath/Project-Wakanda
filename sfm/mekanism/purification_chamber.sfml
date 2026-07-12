@@ -1,0 +1,50 @@
+NAME "Purification Chamber"
+
+-- Mekanism 5x ore processing, step 5 of 7: Shard (item) + Oxygen gas
+-- -> Clump (item).
+-- Source-verified against data/mekanism/recipe/processing/<metal>/clump/from_shard.json
+-- for all 7 base metals -- identical recipe shape per metal:
+--   1x WITH #c:shards/<metal> + oxygen (per-tick) -> 1x clump_<metal>
+--
+-- Output clumps feed directly into the existing crusher.sfml program,
+-- which already carries #c:clumps/<metal> tags for all 7 base metals in
+-- its crushing step -- point this program's Storage label at the same
+-- barrel crusher.sfml reads from.
+--
+-- Labels needed:
+--   Barrel     => input chest/barrel with shard_<metal> items (from
+--                 chemical_injection_chamber.sfml's Storage output)
+--   OxygenTank => Oxygen gas source tank
+--   Chamber    => all Purification Chamber machines
+--   Storage    => output storage for clump_<metal> items
+--   Battery    => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+    INPUT chemical:mekanism:oxygen FROM OxygenTank
+
+    OUTPUT RETAIN 16 WITH #c:shards/iron TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:shards/gold TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:shards/copper TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:shards/lead TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:shards/osmium TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:shards/tin TO EACH Chamber
+    OUTPUT RETAIN 16 WITH #c:shards/uranium TO EACH Chamber
+
+    FORGET
+
+    -- CAVEAT: item output slot index guessed by pattern, not independently
+    -- verified against this machine's container class -- check in-game
+    -- and adjust if items aren't draining.
+    INPUT FROM EACH Chamber SLOTS 2
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
+
+-- Keep every Purification Chamber powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Chamber TOP SIDE
+    FORGET
+END

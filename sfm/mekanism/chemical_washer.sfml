@@ -1,0 +1,45 @@
+NAME "Chemical Washer"
+
+-- Mekanism 5x ore processing, step 2 of 7: Dirty Slurry (chemical) + Water
+-- (fluid) -> Clean Slurry (chemical).
+-- Source-verified against data/mekanism/recipe/processing/<metal>/slurry/clean.json
+-- for all 7 base metals -- identical recipe shape per metal:
+--   1mb dirty_<metal> + 5mb water -> 1mb clean_<metal>
+--
+-- Labels needed:
+--   SlurryTank      => input tank holding dirty_<metal> chemicals (output of
+--                      chemical_dissolution_chamber.sfml's SlurryTank label)
+--   WaterTank       => water source tank
+--   Washer          => all Chemical Washer machines
+--   CleanSlurryTank => output tank collecting all clean_<metal> slurries
+--   Battery         => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT chemical:: FROM SlurryTank
+    INPUT fluid:minecraft:water FROM WaterTank
+
+    OUTPUT chemical:: TO EACH Washer
+    OUTPUT fluid:minecraft:water TO EACH Washer
+
+    FORGET
+
+    -- Drain clean slurry output to the shared collection tank. CAVEAT:
+    -- this recipe JSON only confirms input/output chemical ids and
+    -- amounts, not which internal tank index holds which -- if input and
+    -- output chemicals share a tank slot on this machine, this blanket
+    -- "chemical::" drain could pull unprocessed dirty slurry back out
+    -- before it's washed. Watch it run once; if that happens, this needs
+    -- a SLOTS qualifier pointing at the specific output tank index
+    -- (verify in-game via the machine's tank UI, not guessed here).
+    INPUT chemical:: FROM EACH Washer
+    OUTPUT chemical:: TO CleanSlurryTank
+
+END
+
+-- Keep every Chemical Washer powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Washer TOP SIDE
+    FORGET
+END

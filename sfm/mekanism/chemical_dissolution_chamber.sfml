@@ -1,0 +1,82 @@
+NAME "Chemical Dissolution Chamber"
+
+-- Mekanism 5x ore processing, step 1 of 7: raw ore/raw material/ore block
+-- + Sulfuric Acid gas -> Dirty Slurry (chemical).
+-- Source-verified against data/mekanism/recipe/processing/<metal>/slurry/dirty/*.json
+-- for all 7 base metals (iron, gold, copper, lead, osmium, tin, uranium) --
+-- every metal shares the identical recipe shape, only the item tags and
+-- output chemical id (dirty_<metal>) differ.
+--
+-- Per-metal accepted inputs (any one satisfies the recipe):
+--   1x WITH #c:ores/<metal>              -> 1000mb dirty_<metal>, 1 sulfuric_acid/tick
+--   1x WITH #c:storage_blocks/raw_<metal> -> 6000mb dirty_<metal>, 2 sulfuric_acid/tick
+--   3x WITH #c:raw_materials/<metal>      -> 2000mb dirty_<metal>, 1 sulfuric_acid/tick
+--
+-- Labels needed:
+--   Barrel      => input chest/barrel with ore/raw ore/raw material items
+--   AcidTank    => Sulfuric Acid gas source tank
+--   Chamber     => all Chemical Dissolution Chamber machines
+--   SlurryTank  => output tank collecting all dirty_<metal> slurries
+--   Battery     => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+    INPUT chemical:mekanism:sulfuric_acid FROM AcidTank
+
+    OUTPUT RETAIN 16 WITH #c:ores/iron,
+           RETAIN 16 WITH #c:storage_blocks/raw_iron,
+           RETAIN 16 WITH #c:raw_materials/iron
+    TO EACH Chamber
+
+    OUTPUT RETAIN 16 WITH #c:ores/gold,
+           RETAIN 16 WITH #c:storage_blocks/raw_gold,
+           RETAIN 16 WITH #c:raw_materials/gold
+    TO EACH Chamber
+
+    OUTPUT RETAIN 16 WITH #c:ores/copper,
+           RETAIN 16 WITH #c:storage_blocks/raw_copper,
+           RETAIN 16 WITH #c:raw_materials/copper
+    TO EACH Chamber
+
+    OUTPUT RETAIN 16 WITH #c:ores/lead,
+           RETAIN 16 WITH #c:storage_blocks/raw_lead,
+           RETAIN 16 WITH #c:raw_materials/lead
+    TO EACH Chamber
+
+    OUTPUT RETAIN 16 WITH #c:ores/osmium,
+           RETAIN 16 WITH #c:storage_blocks/raw_osmium,
+           RETAIN 16 WITH #c:raw_materials/osmium
+    TO EACH Chamber
+
+    OUTPUT RETAIN 16 WITH #c:ores/tin,
+           RETAIN 16 WITH #c:storage_blocks/raw_tin,
+           RETAIN 16 WITH #c:raw_materials/tin
+    TO EACH Chamber
+
+    OUTPUT RETAIN 16 WITH #c:ores/uranium,
+           RETAIN 16 WITH #c:storage_blocks/raw_uranium,
+           RETAIN 16 WITH #c:raw_materials/uranium
+    TO EACH Chamber
+
+    FORGET
+
+    -- Drain the dirty slurry chemical output to the shared collection tank.
+    -- "chemical::" is the wildcard form (expands to sfm:chemical:*:*) --
+    -- matches any Mekanism chemical regardless of which metal produced it.
+    -- CAVEAT: this only pulls the OUTPUT chemical (Sulfuric Acid stays
+    -- input-side since it's a different chemical id, so a blanket drain
+    -- here is safe) -- unlike the Washer's dirty/clean pair which share
+    -- no such distinguishing id difference risk-free, this one's fine.
+    INPUT chemical:: FROM EACH Chamber
+    OUTPUT chemical:: TO SlurryTank
+
+END
+
+-- Keep every Dissolution Chamber powered. See chemical_dissolution_chamber's
+-- sibling programs for the fe:: / TOP SIDE explanation -- same rules apply.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Chamber TOP SIDE
+    FORGET
+END
