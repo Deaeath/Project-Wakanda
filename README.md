@@ -40,17 +40,20 @@ matters.
 
 ```
 project-wakanda/
-├── sfm/            Super Factory Manager programs (.sfml)
-├── cc-tweaked/      CC:Tweaked turtle/computer programs (.lua)
-└── tools/           Local Windows helper tools (.ps1 / .bat)
+├── sfm/                        Super Factory Manager programs (.sfml), one subfolder per mod
+│   ├── extendedae/
+│   ├── advancedae/
+│   └── mekanism/
+├── cc-tweaked/                 CC:Tweaked turtle/computer programs (.lua)
+└── tools/                      Local Windows helper tools (.ps1 / .bat)
 ```
 
 | Callsign | File | Role |
 |----------|------|------|
-| **Forge** | [`sfm/crystal_assembler.sfml`](#sfmcrystal_assemblersfml) | ExtendedAE Crystal Assembler automation + self-feeding power |
-| **Cutter** | [`sfm/circuit_cutter.sfml`](#sfmcircuit_cuttersfml) | ExtendedAE Circuit Cutter automation + self-feeding power |
-| **Chamber** | [`sfm/reaction_chamber.sfml`](#sfmreaction_chambersfml) | AdvancedAE Reaction Chamber automation + self-feeding power |
-| **Crusher** | [`sfm/crusher.sfml`](#sfmcrushersfml) | Mekanism Crusher — every crushing recipe in the pack + self-feeding power |
+| **Forge** | [`sfm/extendedae/crystal_assembler.sfml`](#sfmextendedaecrystal_assemblersfml) | ExtendedAE Crystal Assembler automation + self-feeding power |
+| **Cutter** | [`sfm/extendedae/circuit_cutter.sfml`](#sfmextendedaecircuit_cuttersfml) | ExtendedAE Circuit Cutter automation + self-feeding power |
+| **Chamber** | [`sfm/advancedae/reaction_chamber.sfml`](#sfmadvancedaereaction_chambersfml) | AdvancedAE Reaction Chamber automation + self-feeding power |
+| **Crusher** | [`sfm/mekanism/crusher.sfml`](#sfmmekanismcrushersfml) | Mekanism Crusher — every crushing recipe in the pack + self-feeding power |
 | **Jarvis** | [`cc-tweaked/jarvis.lua`](#cc-tweakedjarvislua) | Base assistant — chat commands, alarms, live dashboard |
 | **Griot** | [`cc-tweaked/status.lua`](#cc-tweakedstatuslua) | On-demand diagnostic report for any turtle or computer |
 | **Scribe** | [`cc-tweaked/paste.lua`](#cc-tweakedpastelua) | In-game paste receiver, for when `edit` chokes |
@@ -66,7 +69,7 @@ project-wakanda/
 > whichever face you actually wired for power, on every machine and the
 > battery itself.
 
-## `sfm/crystal_assembler.sfml`
+## `sfm/extendedae/crystal_assembler.sfml`
 
 Automates every ExtendedAE Crystal Assembler recipe **and** keeps the
 assemblers powered — no more walking over to babysit an empty energy buffer.
@@ -94,7 +97,7 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
 
 ---
 
-## `sfm/circuit_cutter.sfml`
+## `sfm/extendedae/circuit_cutter.sfml`
 
 Automates the ExtendedAE Circuit Cutter — one cutter per recipe — and
 keeps every cutter powered.
@@ -118,7 +121,7 @@ keeps every cutter powered.
 
 ---
 
-## `sfm/reaction_chamber.sfml`
+## `sfm/advancedae/reaction_chamber.sfml`
 
 Automates the AdvancedAE Reaction Chamber across both its water and lava
 recipe families, plus fluid output draining and power.
@@ -144,7 +147,7 @@ recipe families, plus fluid output draining and power.
 
 ---
 
-## `sfm/crusher.sfml`
+## `sfm/mekanism/crusher.sfml`
 
 Covers **every crushing recipe registered by any mod in the pack** —
 addons add recipes to Mekanism's own crushing recipe type rather than
@@ -277,43 +280,6 @@ or double-click `type-clipboard.bat` / use the pinned shortcut.
   starts dropping characters under heavy tick load.
 - `-CountdownSeconds` — how long you get to alt-tab back in before it
   starts typing. Default `5`.
-
----
-
-## Lessons paid for in blood
-
-- **SFM has no `POWER` keyword, and `forge:energy` is not the energy
-  resource.** Energy is a *scalar* resource type, referenced with the
-  literal `fe::` (or `rf::`/`energy::`/`power::` — all four alias to the
-  same `forge_energy` type internally). Writing `forge:energy` instead
-  parses as an item lookup for a nonexistent item and silently moves
-  nothing — no error, it just never fires. Confirmed against the
-  bundled `resource_types.sfml` template and the parser bytecode
-  (`ResourceIdentifier`'s constructor literally special-cases
-  `["fe","rf","energy","power"]`).
-- **`OUTPUT ALL <resource> TO ...` isn't valid grammar.** `ALL` expects
-  `TO` or `EXCEPT` immediately after it — the in-game parser error is
-  `mismatched input '<resource>' expecting {TO, EXCEPT}`. To move every
-  unit of a resource, just omit `ALL` entirely: the `::` wildcard in
-  `fe::`/`fluid::` already means "everything of this type."
-- **Mekanism machines need an explicit side qualifier for energy.**
-  Unlike AE2/ExtendedAE blocks, Mekanism's per-face IO config means a
-  cable/manager touching an unconfigured face won't deliver power even
-  though the capability exists. SFM supports targeting a specific face
-  directly — `<label> <direction> side` right after the label (see the
-  bundled `slots_and_sides.sfml` template) — and it has to match
-  whichever face you set to accept Energy in Mekanism's Configurator.
-- **Advanced Peripherals types are snake_case**, not camelCase — always
-  verify against the mod jar (`javap` the `PERIPHERAL_TYPE` constant)
-  before trusting a peripheral name.
-- **Turtle peripherals need turtle *upgrades*, not adjacent blocks.**
-  Crafting a turtle + peripheral item together in a crafting grid
-  produces a *new* turtle with the peripheral built in — it does not
-  retrofit the turtle you already have placed.
-- **`/` will always fight you** in any text-input context inside
-  Minecraft. Either strip it from source (see the `^-1` power-operator
-  trick in `jarvis.lua` for avoiding division), or inject text as
-  Unicode events instead of simulated keypresses.
 
 ---
 
