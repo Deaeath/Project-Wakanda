@@ -13,10 +13,12 @@ NAME "Crystal Assembler"
 -- literal all alias to the same forge_energy resource type). A literal
 -- "forge:energy" is NOT the same thing: that's parsed as an item lookup
 -- for a (nonexistent) item named forge:energy and silently moves nothing.
--- TOP SIDE targets a specific face for the energy capability read/write --
--- change to whichever face you actually wired for power on the Battery
--- and each Assembler (see slots_and_sides.sfml in SFM's bundled
--- examples for the "<label> <direction> side" syntax).
+-- No side qualifier needed here, unlike Mekanism (see crusher.sfml) --
+-- AE2/ExtendedAE blocks don't have Mekanism's per-face IO config, and a
+-- guessed "TOP SIDE" here previously caused silent power failure since
+-- the actual physical connection wasn't necessarily on that face. Same
+-- pattern the item transfers below already use successfully: no side
+-- restriction, works regardless of which face the network cable touches.
 --
 -- EVERY 1 TICKS is correct here, confirmed against SFMServerConfig's
 -- bytecode: timerTriggerMinimumIntervalInTicks defaults to 20, but
@@ -27,8 +29,8 @@ NAME "Crystal Assembler"
 -- block from that fast path and forces the 20-tick minimum instead --
 -- that's why both the resource literal AND the tick count matter here.
 EVERY 1 TICKS DO
-    INPUT fe:: FROM Battery TOP SIDE
-    OUTPUT fe:: TO EACH Assembler TOP SIDE
+    INPUT fe:: FROM Battery
+    OUTPUT fe:: TO EACH Assembler
     FORGET
 END
 

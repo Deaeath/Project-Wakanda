@@ -12,10 +12,12 @@ NAME "Circuit Cutter"
 -- all alias to the same forge_energy resource type). A literal
 -- "forge:energy" is NOT the same thing: that's parsed as an item lookup
 -- for a (nonexistent) item named forge:energy and silently moves nothing.
--- TOP SIDE targets a specific face for the energy capability read/write --
--- change to whichever face you actually wired for power on the Battery
--- and each Slicer (see slots_and_sides.sfml in SFM's bundled examples
--- for the "<label> <direction> side" syntax).
+-- No side qualifier needed here, unlike Mekanism (see crusher.sfml) --
+-- AE2/ExtendedAE blocks don't have Mekanism's per-face IO config; a
+-- guessed side qualifier can cause silent power failure if it doesn't
+-- match the actual physical connection. Same as the item transfers
+-- below: no side restriction, works regardless of which face the
+-- network cable touches.
 -- EVERY 1 TICKS is valid here: a trigger with ONLY forge-energy I/O
 -- statements gets a lower minimum interval (default 1 tick) than the
 -- general 20-tick minimum -- see crystal_assembler.sfml for the full
@@ -23,8 +25,8 @@ NAME "Circuit Cutter"
 -- BOTH sides (INPUT fe:: FROM ..., not bare INPUT FROM ...) or the
 -- block silently reverts to the 20-tick item-default minimum.
 EVERY 1 TICKS DO
-    INPUT fe:: FROM Battery TOP SIDE
-    OUTPUT fe:: TO EACH Slicer TOP SIDE
+    INPUT fe:: FROM Battery
+    OUTPUT fe:: TO EACH Slicer
     FORGET
 END
 
