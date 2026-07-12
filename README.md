@@ -1,35 +1,50 @@
-# SFM Programs — ATM10
+<div align="center">
 
-```
-   _____ ______ __  __   ____                                          
-  / ____|  ____|  \/  | |  _ \                                         
- | (___ | |__  | \  / | | |_) |_ __ ___   __ _ _ __ __ _ _ __ ___  ___  
-  \___ \|  __| | |\/| | |  __/| '__/ _ \ / _` | '__/ _` | '_ ` _ \/ __| 
-  ____) | |    | |  | | | |   | | | (_) | (_| | | | (_| | | | | | \__ \
- |_____/|_|    |_|  |_| |_|   |_|  \___/ \__, |_|  \__,_|_| |_| |_|___/ 
-                                          __/ |                        
-                                         |___/                         
-```
+# 🐆 Project-Wakanda
 
-Automation scripts for a Super Factory Manager + CC:Tweaked base in **All the Mods 10**.
-Machines that never idle, turtles that talk back, a diagnostic dump that
-never crashes, and a couple of local tools to get code into a game that
+### *Wakanda Forever. The base runs itself now.*
+
+**Vibranium-grade automation for a Super Factory Manager + CC:Tweaked base**
+**in All the Mods 10.**
+
+Machines that never idle. Turtles that talk back. A diagnostic dump that
+never crashes. And a couple of local tools to get code into a game that
 actively fights you on it.
+
+[![Status](https://img.shields.io/badge/status-online-black?style=for-the-badge&labelColor=1a1a1a)](#)
+[![Platform](https://img.shields.io/badge/platform-ATM10%20%2F%20NeoForge-purple?style=for-the-badge&labelColor=1a1a1a)](#)
+[![Tech](https://img.shields.io/badge/tech-vibranium-8B0000?style=for-the-badge&labelColor=1a1a1a)](#)
+[![License](https://img.shields.io/badge/license-Wakandan%20Council-yellow?style=for-the-badge&labelColor=1a1a1a)](#)
+
+</div>
 
 ---
 
-## Contents
+## What is this?
 
-| File | What it is |
-|------|------------|
-| [`crystal_assembler.sfml`](#crystal_assemblersfml) | ExtendedAE Crystal Assembler automation + power feed |
-| [`circuit_cutter.sfml`](#circuit_cuttersfml) | ExtendedAE Circuit Cutter automation |
-| [`reaction_chamber.sfml`](#reaction_chambersfml) | AdvancedAE Reaction Chamber automation |
-| [`crusher.sfml`](#crushersfml) | Mekanism Crusher — every crushing recipe in the pack |
-| [`jarvis.lua`](#jarvislua) | CC:Tweaked base assistant: chat commands, alarms, dashboard |
-| [`status.lua`](#statuslua) | One-shot diagnostic dump for any turtle/computer |
-| [`paste.lua`](#pastelua) | In-game line-buffered paste receiver, for when `edit` chokes |
-| [`type-into-mc.ps1`](#type-into-mcps1--type-clipboardbat) | Local Windows auto-typer, clipboard → game window |
+**Project Wakanda** is a self-sufficient production suite: crafting machines
+that feed themselves, turtles that answer you in chat, and a full base
+status report on demand. Point it at your factory once, label the blocks,
+and walk away — it keeps running whether or not you're standing there.
+
+Built the way Wakanda builds things: hidden in plain sight, quietly more
+advanced than everything around it, and never showing its work until it
+matters.
+
+---
+
+## Systems Roster
+
+| Callsign | File | Role |
+|----------|------|------|
+| **Forge** | [`crystal_assembler.sfml`](#crystal_assemblersfml) | ExtendedAE Crystal Assembler automation + self-feeding power |
+| **Cutter** | [`circuit_cutter.sfml`](#circuit_cuttersfml) | ExtendedAE Circuit Cutter automation |
+| **Chamber** | [`reaction_chamber.sfml`](#reaction_chambersfml) | AdvancedAE Reaction Chamber automation |
+| **Crusher** | [`crusher.sfml`](#crushersfml) | Mekanism Crusher — every crushing recipe in the pack |
+| **Jarvis** | [`jarvis.lua`](#jarvislua) | Base assistant — chat commands, alarms, live dashboard |
+| **Griot** | [`status.lua`](#statuslua) | On-demand diagnostic report for any turtle or computer |
+| **Scribe** | [`paste.lua`](#pastelua) | In-game paste receiver, for when `edit` chokes |
+| **Kimoyo** | [`type-into-mc.ps1`](#type-into-mcps1--type-clipboardbat) | Local clipboard-to-game injector |
 
 ---
 
@@ -241,3 +256,11 @@ or double-click `type-clipboard.bat` / use the pinned shortcut.
   Minecraft. Either strip it from source (see the `^-1` power-operator
   trick in `jarvis.lua` for avoiding division), or inject text as
   Unicode events instead of simulated keypresses.
+
+---
+
+<div align="center">
+
+**Wakanda Forever.**
+
+</div>
