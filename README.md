@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🐆 Project-Wakanda
+<img src="banner.webp" alt="Project-Wakanda" width="260" />
+
+# Project-Wakanda
 
 ### *Wakanda Forever. The base runs itself now.*
 
@@ -11,10 +13,10 @@ Machines that never idle. Turtles that talk back. A diagnostic dump that
 never crashes. And a couple of local tools to get code into a game that
 actively fights you on it.
 
-[![Status](https://img.shields.io/badge/status-online-black?style=for-the-badge&labelColor=1a1a1a)](#)
-[![Platform](https://img.shields.io/badge/platform-ATM10%20%2F%20NeoForge-purple?style=for-the-badge&labelColor=1a1a1a)](#)
-[![Tech](https://img.shields.io/badge/tech-vibranium-8B0000?style=for-the-badge&labelColor=1a1a1a)](#)
-[![License](https://img.shields.io/badge/license-Wakandan%20Council-yellow?style=for-the-badge&labelColor=1a1a1a)](#)
+[![Status](https://img.shields.io/badge/status-online-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
+[![Platform](https://img.shields.io/badge/platform-ATM10%20%2F%20NeoForge-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
+[![Tech](https://img.shields.io/badge/tech-vibranium-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
+[![License](https://img.shields.io/badge/license-Wakandan%20Council-00e5ff?style=for-the-badge&labelColor=0a0a0a)](#)
 
 </div>
 
