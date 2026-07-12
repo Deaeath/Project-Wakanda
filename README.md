@@ -66,6 +66,8 @@ project-wakanda/
 | **Jarvis** | [`cc-tweaked/jarvis.lua`](#cc-tweakedjarvislua) | Base assistant — chat commands, alarms, live dashboard |
 | **Griot** | [`cc-tweaked/status.lua`](#cc-tweakedstatuslua) | On-demand diagnostic report for any turtle or computer |
 | **Scribe** | [`cc-tweaked/paste.lua`](#cc-tweakedpastelua) | In-game paste receiver, for when `edit` chokes |
+| **Lift** | [`cc-tweaked/elevator.lua`](#cc-tweakedelevatorlua) | Turtle-pushed vertical lift, chat-commanded by floor name |
+| **Sentry** | [`cc-tweaked/patrol.lua`](#cc-tweakedpatrollua) | Turtle patrol loop with Player Detector intruder alarm |
 | **Kimoyo** | [`tools/type-into-mc.ps1`](#toolstype-into-mcps1--type-clipboardbat) | Local clipboard-to-game injector |
 
 ---
@@ -331,6 +333,68 @@ paste <filename>
 ```
 
 Type or paste your code, then end with a line containing only `:done`.
+
+---
+
+## `cc-tweaked/elevator.lua`
+
+A turtle sitting in a vertical shaft that pushes you along when it
+moves — a real vertical lift, not a simulation.
+
+**Source-verified:** CC:Tweaked turtles can push entities on movement
+using the same `PushReaction` mechanism vanilla pistons use — confirmed
+via `dan200.computercraft.shared.turtle.core.TurtleMoveCommand.canPushEntities()`
+and `dan200.computercraft.shared.config.Config.turtlesCanPush` (defaults
+to enabled). If your server has `turtlesCanPush` disabled, this won't
+push you at all — check that first if it doesn't work, before assuming
+the script is broken.
+
+**Build requirements:**
+- A clear vertical shaft (turtle's own column, minimum) spanning every
+  floor you want to stop at.
+- The turtle sitting in that shaft, powered, with the Chat Box turtle
+  upgrade (see `jarvis.lua`'s notes on why this has to be a crafted
+  upgrade, not an adjacent block).
+- Fuel in the turtle's inventory.
+
+**Configure `FLOORS`** at the top of the file — each entry is `{name,
+height}`, where height is blocks from the bottom of the shaft (where the
+turtle starts). Edit to match your actual base.
+
+**Chat commands:** `elevator floor <name>`, `elevator floors`,
+`elevator status`, `elevator resync <name>` (manually correct the
+turtle's tracked position if a move gets interrupted mid-shaft and it
+loses track of which floor it's actually on).
+
+---
+
+## `cc-tweaked/patrol.lua`
+
+Walks a turtle around a defined loop, watching for non-trusted players
+via a Player Detector and sounding an alarm — same trust-list convention
+as `jarvis.lua`.
+
+**No GPS required.** The route is a relative step sequence (forward N,
+turn, forward N...) starting from wherever the turtle is placed and
+facing when the program first runs, not absolute coordinates. If you set
+up GPS satellites later this could be upgraded to `gps.locate()`-based
+waypoints for a route that self-corrects; until then, an obstruction the
+turtle can't clear leaves it stuck rather than rerouting around it.
+
+**Configure `ROUTE`** at the top of the file as a sequence of
+`{"forward", N}` / `{"turn_left"}` / `{"turn_right"}` / `{"wait", N}`
+steps forming a closed loop back to the start. Also configure
+`TRUSTED_PLAYERS` — same convention as `jarvis.lua`; keep them in sync
+if you run both.
+
+**Notes:**
+- Digs through obstructions in its path — the route is assumed to run
+  through territory you control. If it ever passes anywhere a player
+  could wall it off maliciously, this will tunnel through that too.
+- The alarm-clear logic is time-based (`os.clock()`), not event-driven —
+  this script is synchronous via `sleep()` while walking, unlike
+  `jarvis.lua`'s event loop, so it can't `os.pullEvent("timer")` without
+  risking a hang mid-route.
 
 ---
 
