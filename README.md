@@ -125,6 +125,15 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
   `charged_certus_quartz_crystal`) that can't be fully disambiguated by a
   single signature item — those use an `AND`-combined condition instead;
   see the in-file comments for which.
+- **Periodic unjam trigger** (`EVERY 100 TICKS`): drains every
+  Assembler's input slots (0-8) back to the Barrel, letting the
+  recipe-matching logic above re-supply whatever's actually correct.
+  Fixes machines stuck holding leftover/wrong ingredients. Tradeoff:
+  it can't distinguish "wrong leftover items" from "correct items about
+  to finish a craft" — if a craft takes longer than 100 ticks, this will
+  interrupt it repeatedly and it'll never complete. Lengthen the
+  interval past your actual craft time, or remove the block once
+  machines stop getting stuck.
 
 ---
 

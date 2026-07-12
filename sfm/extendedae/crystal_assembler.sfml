@@ -401,3 +401,24 @@ EVERY REDSTONE PULSE DO
     OUTPUT TO EMPTY SLOTS IN Storage
 
 END
+
+-- Periodic unjam: pull everything currently sitting in every Assembler's
+-- input slots (0-8) back to the Barrel, then let the next REDSTONE PULSE
+-- above re-supply whatever's actually correct. Handles the case where a
+-- machine got stuck holding leftover/wrong ingredients from before this
+-- program used per-recipe gating -- or from a Pattern Provider changing
+-- which pattern it's assigned mid-stock -- and just sits jammed instead
+-- of crafting.
+--
+-- Tradeoff, stated plainly: this can't tell "wrong leftover items" apart
+-- from "correct items about to complete a craft" -- it drains both. If
+-- an Assembler's craft takes longer than this interval to finish, this
+-- will interrupt it repeatedly and it'll never complete. 100 ticks (5
+-- seconds) is a starting guess; if crafts stop finishing, lengthen the
+-- interval well past however long a single craft actually takes, or
+-- remove this block once your machines are no longer getting stuck.
+EVERY 100 TICKS DO
+    INPUT FROM EACH Assembler SLOTS 0-8
+    OUTPUT TO EMPTY SLOTS IN Barrel
+    FORGET
+END
