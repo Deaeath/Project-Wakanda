@@ -14,10 +14,15 @@
 -- Build requirements:
 --   - A clear 1x1 (or wider, turtle just needs its own column clear)
 --     vertical shaft spanning every floor you want to stop at.
---   - The turtle sitting in that shaft, powered, with a Chat Box
---     peripheral attached (see jarvis.lua's Chat Box notes -- turtle
---     upgrade, not adjacent block).
+--   - The turtle sitting in that shaft, powered.
 --   - Fuel: any standard turtle fuel item in its inventory.
+--   - Optional: Chat Box turtle upgrade (see jarvis.lua's Chat Box notes
+--     -- crafted upgrade, not adjacent block) for chat-commanded calls.
+--   - Optional: physical call buttons -- see REDSTONE_CALLS below.
+--   - To auto-start on boot: save this file's contents as "startup" on
+--     the turtle (or `copy elevator startup` if you've already got it
+--     saved under a different name), then `reboot`. It'll launch and
+--     start listening immediately, no manual "elevator" run needed.
 --
 -- Configure FLOORS below. "height" is blocks from the BOTTOM of the
 -- shaft (where the turtle starts), not a world Y-coordinate -- only the
@@ -31,6 +36,19 @@
 local FLOORS = {
     { name = "lower", height = 0 },
     { name = "upper", height = 33 },
+}
+
+-- Physical call buttons: run redstone wire (dust + repeaters as needed)
+-- from a lever/button at each floor down/up the shaft to a distinct side
+-- on the turtle. When that side goes high, the elevator is called to the
+-- mapped floor -- no chat command needed. Only sides not otherwise used
+-- (the turtle needs "top"/"bottom" free for movement, though redstone
+-- input doesn't actually block movement, it's just avoided here for
+-- clarity) are mapped below; add/remove entries to match how you wire it.
+-- Leave empty ({}) to disable physical call buttons entirely.
+local REDSTONE_CALLS = {
+    front = "lower",
+    back  = "upper",
 }
 
 local NAME = "ELEVATOR"
@@ -163,19 +181,41 @@ local function handleCommand(cmd, sender)
     end
 end
 
+local function callButtonCount()
+    local n = 0
+    for _ in pairs(REDSTONE_CALLS) do n = n + 1 end
+    return n
+end
+
 term.clear()
 term.setCursorPos(1, 1)
 print(NAME .. " online.")
-print("Chat Box: " .. (chat and "YES" or "no -- required, this program only listens for chat commands"))
+print("Chat Box:      " .. (chat and "YES" or "no -- chat commands won't work without one"))
+print("Call buttons:  " .. (callButtonCount() > 0 and callButtonCount() .. " side(s) mapped" or "none configured"))
 listFloors()
-say(NAME .. " ready. Say 'elevator floor <name>' in chat.")
+say(NAME .. " ready. Say 'elevator floor <name>' in chat, or use a call button.")
 
+-- Unfiltered event loop -- catches both "chat" (unless no Chat Box, in
+-- which case that event type never fires anyway) and "redstone" (fires
+-- once per actual signal change on any side, not continuously while a
+-- lever is held, so no extra debouncing needed here).
 while true do
-    local event, username, message = os.pullEvent("chat")
-    if chat then
+    local event, a, b = os.pullEvent()
+
+    if event == "chat" and chat then
+        local username, message = a, b
         local prefix = message:match("^[Ee][Ll][Ee][Vv][Aa][Tt][Oo][Rr][,:]?%s*(.*)")
         if prefix and #prefix > 0 then
             handleCommand(prefix, username)
+        end
+    elseif event == "redstone" then
+        for side, floorName in pairs(REDSTONE_CALLS) do
+            if redstone.getInput(side) then
+                local idx = findFloor(floorName)
+                if idx then
+                    goToFloor(idx)
+                end
+            end
         end
     end
 end
