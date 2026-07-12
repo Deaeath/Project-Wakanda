@@ -4,14 +4,20 @@ NAME "Crystal Assembler"
 --
 -- Each Assembler is configured (via its own AE2 pattern / Pattern
 -- Provider) to exactly ONE of the ~30 recipes below. Broadcasting every
--- recipe's ingredients to every Assembler (the original approach)
--- stuffed unrelated items into machines that didn't need them, fighting
--- the Pattern Provider over slot occupancy and breaking builds. Fixed
--- by gating each recipe behind an "IF Barrel has gt 0 <signature item>"
--- check -- only supply a recipe's ingredients when its signature
--- ingredient is actually present in the Barrel -- and by targeting an
--- explicit SLOTS index per ingredient so each item lands in the grid
--- position that recipe actually needs.
+-- recipe's ingredients to EVERY Assembler simultaneously (the original
+-- approach, "TO EACH Assembler") stuffed unrelated items into machines
+-- that didn't need them, fighting the Pattern Provider over slot
+-- occupancy and breaking builds. Fixed two ways, confirmed against the
+-- official bundled round_robin.sfml example:
+--   1. Each recipe gated behind "IF Barrel has gt 0 <signature item>" --
+--      only supply a recipe's ingredients when its signature is present.
+--   2. "TO EACH Assembler" replaced with "TO Assembler ROUND ROBIN BY
+--      BLOCK" -- targets exactly ONE Assembler per statement execution
+--      instead of all of them at once, rotating which one on each
+--      subsequent pulse. This is what actually stops a supply push from
+--      hitting every matching machine simultaneously.
+-- Every ingredient still targets an explicit SLOTS index so it lands in
+-- the grid position that recipe actually needs.
 --
 -- CAVEAT, stated plainly: slot indices below are NOT verified against
 -- the Assembler's real container class -- they're assigned sequentially
@@ -71,235 +77,235 @@ EVERY REDSTONE PULSE DO
     -- printed_X + printed_silicon + (redstone dust OR fluix dust) -> X_processor
     IF Barrel has gt 0 minecraft:redstone THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 minecraft:redstone TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 4 ae2:printed_silicon TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 EACH *processor* EXCEPT *accumulation* TO EACH Assembler SLOTS 0
+        OUTPUT RETAIN 4 minecraft:redstone TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 4 ae2:printed_silicon TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 EACH *processor* EXCEPT *accumulation* TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     IF Barrel has gt 0 WITH #c:dusts/fluix THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 WITH #c:dusts/fluix TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 4 ae2:printed_silicon TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 EACH *accumulation* TO EACH Assembler SLOTS 0
+        OUTPUT RETAIN 4 WITH #c:dusts/fluix TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 4 ae2:printed_silicon TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 EACH *accumulation* TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     -- === active_formation_plane ===
     -- signature: ex_export_bus_part (not used by any other recipe here)
     IF Barrel has gt 0 extendedae:ex_export_bus_part THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:formation_plane TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 minecraft:piston TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 ae2:formation_core TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 extendedae:ex_export_bus_part TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:formation_plane TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 minecraft:piston TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 ae2:formation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 extendedae:ex_export_bus_part TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === smart_annihilation_plane ===
     -- signature: ex_import_bus_part
     IF Barrel has gt 0 extendedae:ex_import_bus_part THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:annihilation_plane TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 minecraft:piston TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 ae2:annihilation_core TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 extendedae:ex_import_bus_part TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:annihilation_plane TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 minecraft:piston TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 ae2:annihilation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 extendedae:ex_import_bus_part TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === assembler_matrix_crafter ===
     -- signature: ex_molecular_assembler
     IF Barrel has gt 0 extendedae:ex_molecular_assembler THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:assembler_matrix_wall TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 extendedae:ex_molecular_assembler TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 6 ae2:purple_lumen_paint_ball TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:logic_processor TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:assembler_matrix_wall TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 extendedae:ex_molecular_assembler TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 6 ae2:purple_lumen_paint_ball TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:logic_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === assembler_matrix_pattern ===
     -- signature: blue_lumen_paint_ball
     IF Barrel has gt 0 ae2:blue_lumen_paint_ball THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:assembler_matrix_wall TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 WITH #extendedae:extended_pattern_provider TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 6 ae2:blue_lumen_paint_ball TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:engineering_processor TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:assembler_matrix_wall TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 WITH #extendedae:extended_pattern_provider TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 6 ae2:blue_lumen_paint_ball TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:engineering_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === assembler_matrix_speed ===
     -- signature: red_lumen_paint_ball
     IF Barrel has gt 0 ae2:red_lumen_paint_ball THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:assembler_matrix_wall TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 8 ae2:speed_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 6 ae2:red_lumen_paint_ball TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 extendedae:concurrent_processor TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:assembler_matrix_wall TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 8 ae2:speed_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 6 ae2:red_lumen_paint_ball TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === budding (needs water fluid separately) ===
     -- signature: entro_seed
     IF Barrel has gt 0 extendedae:entro_seed THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:entro_seed TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 ae2:fluix_block TO EACH Assembler SLOTS 1
+        OUTPUT RETAIN 1 extendedae:entro_seed TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 ae2:fluix_block TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
     END
 
     -- === caner ===
     -- signature: ingredient_buffer
     IF Barrel has gt 0 extendedae:ingredient_buffer THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:machine_frame TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 extendedae:ingredient_buffer TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 ae2:formation_core TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:annihilation_core TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:machine_frame TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 extendedae:ingredient_buffer TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 ae2:formation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:annihilation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === circuit_cutter ===
     -- signature: calculation_processor_press (unique to this recipe)
     IF Barrel has gt 0 ae2:calculation_processor_press THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:machine_frame TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 8 ae2:engineering_processor TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 ae2:calculation_processor_press TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:engineering_processor_press TO EACH Assembler SLOTS 3
-        OUTPUT RETAIN 1 ae2:logic_processor_press TO EACH Assembler SLOTS 4
-        OUTPUT RETAIN 1 ae2:silicon_press TO EACH Assembler SLOTS 5
-        OUTPUT RETAIN 1 extendedae:concurrent_processor_press TO EACH Assembler SLOTS 6
-        OUTPUT RETAIN 1 minecraft:stonecutter TO EACH Assembler SLOTS 7
+        OUTPUT RETAIN 1 extendedae:machine_frame TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 8 ae2:engineering_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 ae2:calculation_processor_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:engineering_processor_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
+        OUTPUT RETAIN 1 ae2:logic_processor_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 4
+        OUTPUT RETAIN 1 ae2:silicon_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 5
+        OUTPUT RETAIN 1 extendedae:concurrent_processor_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 6
+        OUTPUT RETAIN 1 minecraft:stonecutter TO Assembler ROUND ROBIN BY BLOCK SLOTS 7
     END
 
     -- === circuit_cutter (KubeJS alternate recipe) ===
     -- signature: kubejs:universal_press
     IF Barrel has gt 0 kubejs:universal_press THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:machine_frame TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 8 ae2:engineering_processor TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 kubejs:universal_press TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 minecraft:stonecutter TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:machine_frame TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 8 ae2:engineering_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 kubejs:universal_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 minecraft:stonecutter TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === concurrent_press ===
     -- signature: ender_eye (unique to this recipe)
     IF Barrel has gt 0 minecraft:ender_eye THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 3 minecraft:ender_eye TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 WITH #c:gems/entro TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 ae2:silicon_press TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 3 minecraft:ender_eye TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 WITH #c:gems/entro TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 ae2:silicon_press TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === crystal_fixer ===
     -- signature: quartz_fiber
     IF Barrel has gt 0 ae2:quartz_fiber THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 WITH #ae2:all_certus_quartz TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 2 ae2:quartz_fiber TO EACH Assembler SLOTS 1
+        OUTPUT RETAIN 4 WITH #ae2:all_certus_quartz TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 2 ae2:quartz_fiber TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
     END
 
     -- === entro_ingot_transformation (needs water fluid separately) ===
     -- signature: dusts/entro tag (not used elsewhere in this file)
     IF Barrel has gt 0 WITH #c:dusts/entro THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 WITH #c:dusts/entro TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 WITH #c:ingots/gold TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 minecraft:lapis_lazuli TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 4 WITH #c:dusts/entro TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 WITH #c:ingots/gold TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 minecraft:lapis_lazuli TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === ex_charger ===
     -- signature: ae2:charger item itself
     IF Barrel has gt 0 ae2:charger THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:charger TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 ae2:capacity_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 extendedae:concurrent_processor TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 1 ae2:charger TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 ae2:capacity_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === ex_drive ===
     -- signature: ae2:drive item itself
     IF Barrel has gt 0 ae2:drive THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:drive TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 2 WITH #ae2:glass_cable TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 ae2:capacity_card TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 extendedae:concurrent_processor TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:drive TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 2 WITH #ae2:glass_cable TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 ae2:capacity_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === ex_export_bus ===
     -- signature: ae2:export_bus item itself
     IF Barrel has gt 0 ae2:export_bus THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:export_bus TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 ae2:speed_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 minecraft:piston TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:formation_core TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:export_bus TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 ae2:speed_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 minecraft:piston TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:formation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === ex_import_bus ===
     -- signature: ae2:import_bus item itself
     IF Barrel has gt 0 ae2:import_bus THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:import_bus TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 ae2:speed_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 minecraft:piston TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:annihilation_core TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:import_bus TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 ae2:speed_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 minecraft:piston TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:annihilation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === ex_inscriber ===
     -- signature: ae2:inscriber item itself
     IF Barrel has gt 0 ae2:inscriber THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:inscriber TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 ae2:capacity_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 extendedae:concurrent_processor TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 1 ae2:inscriber TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 ae2:capacity_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === ex_interface ===
     -- signature: WITH #ae2:interface tag
     IF Barrel has gt 0 WITH #ae2:interface THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #ae2:interface TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 ae2:capacity_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 3 WITH #c:glass_blocks TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 extendedae:concurrent_processor TO EACH Assembler SLOTS 3
-        OUTPUT RETAIN 6 WITH #ae2:glass_cable TO EACH Assembler SLOTS 4
+        OUTPUT RETAIN 1 WITH #ae2:interface TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 ae2:capacity_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 3 WITH #c:glass_blocks TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
+        OUTPUT RETAIN 6 WITH #ae2:glass_cable TO Assembler ROUND ROBIN BY BLOCK SLOTS 4
     END
 
     -- === ex_io_port ===
     -- signature: ae2:io_port item itself
     IF Barrel has gt 0 ae2:io_port THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:io_port TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 ae2:speed_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 3 ae2:logic_processor TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 2 extendedae:concurrent_processor TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:io_port TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 ae2:speed_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 3 ae2:logic_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 2 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === ex_molecular_assembler ===
     -- signature: ae2:molecular_assembler item itself
     IF Barrel has gt 0 ae2:molecular_assembler THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 ae2:molecular_assembler TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 extendedae:concurrent_processor TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 WITH #c:dusts/fluix TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 3 ae2:engineering_processor TO EACH Assembler SLOTS 3
-        OUTPUT RETAIN 1 ae2:speed_card TO EACH Assembler SLOTS 4
+        OUTPUT RETAIN 4 ae2:molecular_assembler TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 WITH #c:dusts/fluix TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 3 ae2:engineering_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
+        OUTPUT RETAIN 1 ae2:speed_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 4
     END
 
     -- === ex_pattern_access_terminal ===
     -- signature: ae2:pattern_access_terminal item itself
     IF Barrel has gt 0 ae2:pattern_access_terminal THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:pattern_access_terminal TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 minecraft:redstone_lamp TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 ae2:logic_processor TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 4 ae2:quartz_fixture TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:pattern_access_terminal TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 minecraft:redstone_lamp TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 ae2:logic_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 4 ae2:quartz_fixture TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === ex_pattern_provider ===
     -- signature: WITH #ae2:pattern_provider tag
     IF Barrel has gt 0 WITH #ae2:pattern_provider THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #ae2:pattern_provider TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 3 ae2:capacity_card TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 3 minecraft:crafting_table TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 extendedae:concurrent_processor TO EACH Assembler SLOTS 3
-        OUTPUT RETAIN 6 WITH #ae2:glass_cable TO EACH Assembler SLOTS 4
+        OUTPUT RETAIN 1 WITH #ae2:pattern_provider TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 3 ae2:capacity_card TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 3 minecraft:crafting_table TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
+        OUTPUT RETAIN 6 WITH #ae2:glass_cable TO Assembler ROUND ROBIN BY BLOCK SLOTS 4
     END
 
     -- === fluix_transformation (needs water fluid separately) ===
@@ -308,40 +314,40 @@ EVERY REDSTONE PULSE DO
     -- sky_* recipe) to disambiguate.
     IF Barrel has gt 0 ae2:charged_certus_quartz_crystal AND Barrel has gt 0 WITH #c:gems/quartz THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 WITH #c:dusts/redstone TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 WITH #c:gems/quartz TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 WITH #c:dusts/redstone TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 WITH #c:gems/quartz TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === oversize_interface ===
     -- signature: extended_interface tag
     IF Barrel has gt 0 WITH #extendedae:extended_interface THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #extendedae:extended_interface TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 1 extendedae:ingredient_buffer TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 extendedae:concurrent_processor TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 2 ae2:annihilation_core TO EACH Assembler SLOTS 3
-        OUTPUT RETAIN 2 ae2:formation_core TO EACH Assembler SLOTS 4
+        OUTPUT RETAIN 1 WITH #extendedae:extended_interface TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 1 extendedae:ingredient_buffer TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 2 ae2:annihilation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
+        OUTPUT RETAIN 2 ae2:formation_core TO Assembler ROUND ROBIN BY BLOCK SLOTS 4
     END
 
     -- === redstone_crystal (needs water fluid separately) ===
     -- signature: gems/fluix tag AND dusts/glowstone tag combo
     IF Barrel has gt 0 WITH #c:gems/fluix AND Barrel has gt 0 WITH #c:dusts/glowstone THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 minecraft:redstone_block TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 WITH #c:gems/fluix TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 WITH #c:dusts/glowstone TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 4 minecraft:redstone_block TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 WITH #c:gems/fluix TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 WITH #c:dusts/glowstone TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === sky_bronze / sky_steel / sky_osmium (needs lava fluid separately) ===
     -- signature combo: sky_stone_block AND all three metal tags present
     IF Barrel has gt 0 ae2:sky_stone_block AND Barrel has gt 0 WITH #c:ingots/iron THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 ae2:sky_stone_block TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 WITH #c:ingots/copper TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 4 WITH #c:ingots/iron TO EACH Assembler SLOTS 3
-        OUTPUT RETAIN 4 WITH #c:ingots/osmium TO EACH Assembler SLOTS 4
+        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 ae2:sky_stone_block TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 WITH #c:ingots/copper TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 4 WITH #c:ingots/iron TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
+        OUTPUT RETAIN 4 WITH #c:ingots/osmium TO Assembler ROUND ROBIN BY BLOCK SLOTS 4
     END
 
     -- === KubeJS-added: sky_bronze_ingot (needs lava fluid separately) ===
@@ -350,48 +356,48 @@ EVERY REDSTONE PULSE DO
     -- firing together is harmless, see file header note)
     IF Barrel has gt 0 minecraft:copper_ingot AND Barrel has gt 0 ae2:sky_stone_block THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 minecraft:copper_ingot TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 ae2:sky_stone_block TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 minecraft:copper_ingot TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 ae2:sky_stone_block TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === KubeJS-added: sky_osmium_ingot (needs lava fluid separately) ===
     -- signature: alltheores:osmium_ingot exact item
     IF Barrel has gt 0 alltheores:osmium_ingot THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 4 alltheores:osmium_ingot TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 ae2:sky_stone_block TO EACH Assembler SLOTS 2
+        OUTPUT RETAIN 4 ae2:charged_certus_quartz_crystal TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 4 alltheores:osmium_ingot TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 ae2:sky_stone_block TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
     END
 
     -- === wireless_connector ===
     -- signature: ae2:wireless_booster (not used by wireless_hub/wireless_kit)
     IF Barrel has gt 0 ae2:wireless_booster THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:machine_frame TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 2 WITH #ae2:smart_dense_cable TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 2 ae2:wireless_receiver TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 3 ae2:wireless_booster TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:machine_frame TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 2 WITH #ae2:smart_dense_cable TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 2 ae2:wireless_receiver TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 3 ae2:wireless_booster TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === wireless_hub ===
     -- signature: ae2:quantum_link (unique to this recipe)
     IF Barrel has gt 0 ae2:quantum_link THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 extendedae:wireless_connect TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 8 WITH #ae2:smart_cable TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 4 extendedae:concurrent_processor TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:quantum_link TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 extendedae:wireless_connect TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 8 WITH #ae2:smart_cable TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 4 extendedae:concurrent_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:quantum_link TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     -- === wireless_kit ===
     -- signature: ae2:singularity (unique to this recipe)
     IF Barrel has gt 0 ae2:singularity THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:wireless_receiver TO EACH Assembler SLOTS 0
-        OUTPUT RETAIN 2 WITH #c:ingots/iron TO EACH Assembler SLOTS 1
-        OUTPUT RETAIN 1 ae2:calculation_processor TO EACH Assembler SLOTS 2
-        OUTPUT RETAIN 1 ae2:singularity TO EACH Assembler SLOTS 3
+        OUTPUT RETAIN 1 ae2:wireless_receiver TO Assembler ROUND ROBIN BY BLOCK SLOTS 0
+        OUTPUT RETAIN 2 WITH #c:ingots/iron TO Assembler ROUND ROBIN BY BLOCK SLOTS 1
+        OUTPUT RETAIN 1 ae2:calculation_processor TO Assembler ROUND ROBIN BY BLOCK SLOTS 2
+        OUTPUT RETAIN 1 ae2:singularity TO Assembler ROUND ROBIN BY BLOCK SLOTS 3
     END
 
     FORGET

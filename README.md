@@ -113,11 +113,7 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
 - Each assembler must be configured to its recipe via the machine GUI
   (typically an AE2 Pattern Provider assigning it a specific pattern).
 - **Each recipe is gated behind `IF Barrel has gt 0 <signature item>`**
-  and every ingredient targets an explicit `SLOTS` index. Broadcasting
-  all ~30 recipes' ingredients to every Assembler unconditionally (the
-  original approach) stuffed unrelated items into machines configured
-  for a different recipe, fighting the Pattern Provider over slot
-  occupancy and breaking builds instead of feeding them. Slot indices
+  and every ingredient targets an explicit `SLOTS` index. Slot indices
   are **not verified** against the Assembler's real container class —
   they're assigned sequentially per recipe and need in-game confirmation
   (open the GUI mid-craft, check the numbers match). A few recipes share
@@ -125,15 +121,26 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
   `charged_certus_quartz_crystal`) that can't be fully disambiguated by a
   single signature item — those use an `AND`-combined condition instead;
   see the in-file comments for which.
+- **`TO Assembler ROUND ROBIN BY BLOCK`, not `TO EACH Assembler`.**
+  Confirmed against the official bundled `round_robin.sfml` example:
+  `TO EACH X` broadcasts to every matching block simultaneously every
+  execution; `TO X ROUND ROBIN BY BLOCK` targets exactly one, rotating
+  which one on each subsequent pulse. The original broadcast approach
+  stuffed every recipe's ingredients into every Assembler at once,
+  fighting the Pattern Provider over slot occupancy and breaking builds.
 - **Periodic unjam trigger** (`EVERY 100 TICKS`): drains every
-  Assembler's input slots (0-8) back to the Barrel, letting the
-  recipe-matching logic above re-supply whatever's actually correct.
-  Fixes machines stuck holding leftover/wrong ingredients. Tradeoff:
-  it can't distinguish "wrong leftover items" from "correct items about
-  to finish a craft" — if a craft takes longer than 100 ticks, this will
-  interrupt it repeatedly and it'll never complete. Lengthen the
-  interval past your actual craft time, or remove the block once
-  machines stop getting stuck.
+  Assembler's input slots (0-8) **out to Storage** (not back to the
+  Barrel — draining to Barrel just fed wrong items right back into the
+  next pulse's supply, often onto a *different* Assembler than the one
+  they came from, since neither SFM nor the broadcast/round-robin
+  targeting has any memory of which machine an item originated from).
+  Fixes machines stuck holding leftover/wrong ingredients; move an item
+  back from Storage to Barrel manually if it turns out to still be
+  needed. Tradeoff: it can't distinguish "wrong leftover items" from
+  "correct items about to finish a craft" — if a craft takes longer than
+  100 ticks, this will interrupt it repeatedly and it'll never complete.
+  Lengthen the interval past your actual craft time, or remove the block
+  once machines stop getting stuck.
 
 ---
 

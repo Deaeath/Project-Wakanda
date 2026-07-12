@@ -34,55 +34,56 @@ END
 EVERY REDSTONE PULSE DO
 
     -- Slicer has only 2 slots total (0=input, 1=output) and 6 different
-    -- single-item recipes all compete for that one input slot. Unlike
-    -- crystal_assembler.sfml's multi-slot combos, IF-gating here only
-    -- avoids pushing an item that isn't in the Barrel at all -- it can't
-    -- decide which of several simultaneously-available items "should"
-    -- win an already-occupied slot. The periodic unjam trigger below is
-    -- what actually keeps machines from getting stuck on the wrong item;
-    -- these IF gates are a cheap first-pass filter on top of that.
+    -- single-item recipes all compete for that one input slot. Each
+    -- OUTPUT below targets "TO Slicer ROUND ROBIN BY BLOCK" instead of
+    -- "TO EACH Slicer" -- confirmed via the official bundled
+    -- round_robin.sfml example -- so a push hits exactly one Slicer per
+    -- execution (rotating which one) instead of every Slicer at once.
+    -- IF-gating on top of that still only avoids pushing an item that
+    -- isn't in the Barrel at all; the periodic unjam trigger below is
+    -- the backstop for whatever still gets stuck.
 
     IF Barrel has gt 0 ae2:quartz_block THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 ae2:quartz_block TO EACH Slicer SLOTS 0
+        OUTPUT RETAIN 1 ae2:quartz_block TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     IF Barrel has gt 0 WITH #c:storage_blocks/gold THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #c:storage_blocks/gold TO EACH Slicer SLOTS 0
+        OUTPUT RETAIN 1 WITH #c:storage_blocks/gold TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     IF Barrel has gt 0 WITH #c:storage_blocks/diamond THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #c:storage_blocks/diamond TO EACH Slicer SLOTS 0
+        OUTPUT RETAIN 1 WITH #c:storage_blocks/diamond TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     IF Barrel has gt 0 WITH #c:storage_blocks/silicon THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #c:storage_blocks/silicon TO EACH Slicer SLOTS 0
+        OUTPUT RETAIN 1 WITH #c:storage_blocks/silicon TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     IF Barrel has gt 0 WITH #c:storage_blocks/entro THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 WITH #c:storage_blocks/entro TO EACH Slicer SLOTS 0
+        OUTPUT RETAIN 1 WITH #c:storage_blocks/entro TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     -- AdvancedAE quantum processor print (requires extendedae loaded, which it is here)
     IF Barrel has gt 0 advanced_ae:quantum_alloy_block THEN
         INPUT FROM Barrel
-        OUTPUT RETAIN 1 advanced_ae:quantum_alloy_block TO EACH Slicer SLOTS 0
+        OUTPUT RETAIN 1 advanced_ae:quantum_alloy_block TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     END
 
     -- Uncomment if you have megacells installed:
     -- IF Barrel has gt 0 megacells:sky_steel_block THEN
     --     INPUT FROM Barrel
-    --     OUTPUT RETAIN 1 megacells:sky_steel_block TO EACH Slicer SLOTS 0
+    --     OUTPUT RETAIN 1 megacells:sky_steel_block TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     -- END
 
     -- Uncomment if you have appflux installed:
     -- IF Barrel has gt 0 appflux:charged_redstone_block THEN
     --     INPUT FROM Barrel
-    --     OUTPUT RETAIN 1 appflux:charged_redstone_block TO EACH Slicer SLOTS 0
+    --     OUTPUT RETAIN 1 appflux:charged_redstone_block TO Slicer ROUND ROBIN BY BLOCK SLOTS 0
     -- END
 
     FORGET
