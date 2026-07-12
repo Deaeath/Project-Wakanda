@@ -110,7 +110,21 @@ assemblers powered — no more walking over to babysit an empty energy buffer.
 - Recipes needing fluids (budding, entro_ingot, fluix_transformation,
   redstone_crystal, sky_bronze/steel/osmium) need water or lava piped in
   separately — SFM doesn't move fluids in this program.
-- Each assembler must be configured to its recipe via the machine GUI.
+- Each assembler must be configured to its recipe via the machine GUI
+  (typically an AE2 Pattern Provider assigning it a specific pattern).
+- **Each recipe is gated behind `IF Barrel has gt 0 <signature item>`**
+  and every ingredient targets an explicit `SLOTS` index. Broadcasting
+  all ~30 recipes' ingredients to every Assembler unconditionally (the
+  original approach) stuffed unrelated items into machines configured
+  for a different recipe, fighting the Pattern Provider over slot
+  occupancy and breaking builds instead of feeding them. Slot indices
+  are **not verified** against the Assembler's real container class —
+  they're assigned sequentially per recipe and need in-game confirmation
+  (open the GUI mid-craft, check the numbers match). A few recipes share
+  generic ingredients (`capacity_card`, `concurrent_processor`, `piston`,
+  `charged_certus_quartz_crystal`) that can't be fully disambiguated by a
+  single signature item — those use an `AND`-combined condition instead;
+  see the in-file comments for which.
 
 ---
 
