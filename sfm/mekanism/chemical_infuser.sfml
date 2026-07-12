@@ -1,0 +1,49 @@
+NAME "Chemical Infuser"
+
+-- Produces the exact gases the 5x ore processing chain consumes --
+-- closes the loop with chemical_dissolution_chamber.sfml (needs Sulfuric
+-- Acid) and chemical_injection_chamber.sfml (needs Hydrogen Chloride).
+-- Source-verified against ALL 3 recipes in
+-- data/mekanism/recipe/chemical_infusing/*.json (this is the complete
+-- set, not a sample):
+--   1x hydrogen        + 1x chlorine       -> 1x hydrogen_chloride
+--   1x sulfur_trioxide  + 1x water_vapor    -> 1x sulfuric_acid
+--   1x oxygen          + 2x sulfur_dioxide -> 2x sulfur_trioxide
+--
+-- Note the third recipe is itself an input to the second (sulfur_trioxide
+-- feeds both) -- this program processes both concurrently, so keep both
+-- gas pairs stocked if you want a self-sustaining Sulfuric Acid supply
+-- from Oxygen + Sulfur Dioxide rather than feeding Sulfur Trioxide directly.
+--
+-- Labels needed:
+--   LeftTank  => tank supplying hydrogen / sulfur_trioxide / oxygen
+--   RightTank => tank supplying chlorine / water_vapor / sulfur_dioxide
+--   Infuser   => all Chemical Infuser machines
+--   OutTank   => output tank collecting hydrogen_chloride / sulfuric_acid
+--                / sulfur_trioxide
+--   Battery   => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT chemical:: FROM LeftTank
+    INPUT chemical:: FROM RightTank
+
+    OUTPUT chemical:: TO EACH Infuser
+
+    FORGET
+
+    -- CAVEAT: same dual-tank drain risk noted in chemical_washer.sfml --
+    -- if this machine's input and output chemical tanks aren't
+    -- distinguished by SFM automatically, a blanket "chemical::" drain
+    -- could pull unreacted input gas back out. Watch it run once.
+    INPUT chemical:: FROM EACH Infuser
+    OUTPUT chemical:: TO OutTank
+
+END
+
+-- Keep every Chemical Infuser powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Infuser TOP SIDE
+    FORGET
+END

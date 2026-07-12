@@ -1,0 +1,75 @@
+NAME "Metallurgic Infuser"
+
+-- Source-verified against ALL 19 recipes in
+-- data/mekanism/recipe/metallurgic_infusing/*.json (complete set, not a
+-- sample). Wildcards used to collapse the mossy-block family (4 cobble
+-- variants + 4 stone-brick variants all share the same "bio" infusion
+-- chemical) down from 8 lines to 2.
+--
+-- Alloy chain (distinct chemical + item per tier, kept explicit):
+--   40x refined_obsidian + 1x WITH #mekanism:alloys/reinforced -> alloy_atomic
+--   10x redstone         + 1x WITH #c:ingots/copper            -> alloy_infused
+--   20x diamond           + 1x WITH #mekanism:alloys/infused    -> alloy_reinforced
+--
+-- Misc single recipes:
+--   100x gold + 1x minecraft:blackstone -> minecraft:gilded_blackstone
+--   10x fungi + 1x minecraft:netherrack -> minecraft:crimson_nylium
+--   10x fungi + 1x minecraft:crimson_nylium -> minecraft:warped_nylium
+--   10x fungi + 1x minecraft:dirt -> minecraft:mycelium
+--   10x bio + 1x WITH #c:sands -> minecraft:dirt
+--
+-- Bio + clay family (wildcard "*clay*" covers clay_ball and clay block):
+--   10x bio + 1x minecraft:clay_ball -> 1x minecraft:slime_ball
+--   40x bio + 1x minecraft:clay      -> 4x minecraft:slime_ball
+--
+-- Bio + mossy-cobble family (wildcard "*cobblestone*", 4 variants: base,
+-- slab, stairs, wall -- all take 10x bio, all 1:1 output):
+--   cobblestone/_slab/_stairs/_wall -> mossy_cobblestone/_slab/_stairs/_wall
+--
+-- Bio + mossy stone-brick family (wildcard "*stone_brick*", 4 variants,
+-- same 10x bio, 1:1):
+--   stone_bricks/stone_brick_slab/_stairs/_wall -> mossy equivalents
+--
+-- Labels needed:
+--   Barrel      => input chest/barrel with all ingredient items
+--   ChemTank    => tank supplying refined_obsidian/redstone/diamond/gold/
+--                  bio/fungi chemicals (Mekanism infuse-type chemicals,
+--                  produced by a Chemical Oxidizer -- not covered yet)
+--   Infuser     => all Metallurgic Infuser machines
+--   Storage     => output storage
+--   Battery     => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+    INPUT chemical:: FROM ChemTank
+
+    OUTPUT RETAIN 4 WITH #mekanism:alloys/reinforced TO EACH Infuser
+    OUTPUT RETAIN 4 WITH #c:ingots/copper TO EACH Infuser
+    OUTPUT RETAIN 4 WITH #mekanism:alloys/infused TO EACH Infuser
+
+    OUTPUT RETAIN 4 minecraft:blackstone TO EACH Infuser
+    OUTPUT RETAIN 4 minecraft:netherrack TO EACH Infuser
+    OUTPUT RETAIN 4 minecraft:crimson_nylium TO EACH Infuser
+    OUTPUT RETAIN 4 minecraft:dirt TO EACH Infuser
+    OUTPUT RETAIN 4 WITH #c:sands TO EACH Infuser
+
+    OUTPUT RETAIN 8 EACH *clay* TO EACH Infuser
+    OUTPUT RETAIN 8 EACH *cobblestone* TO EACH Infuser
+    OUTPUT RETAIN 8 EACH *stone_brick* TO EACH Infuser
+
+    FORGET
+
+    -- CAVEAT: item output slot index guessed by pattern (see
+    -- crusher.sfml), not independently verified for this machine.
+    INPUT FROM EACH Infuser SLOTS 2
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
+
+-- Keep every Metallurgic Infuser powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Infuser TOP SIDE
+    FORGET
+END

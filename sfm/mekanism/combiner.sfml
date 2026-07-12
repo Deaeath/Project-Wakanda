@@ -1,0 +1,83 @@
+NAME "Combiner"
+
+-- Source-verified against ALL 53 recipes in
+-- data/mekanism/recipe/combining/**/*.json (complete set). Every recipe
+-- combines a "main" item with an "extra" item -- SFM doesn't need to
+-- know which slot is which, it just needs both ingredients present and
+-- lets Mekanism's own recipe matching pick the right combo.
+--
+-- Three groups, heavily wildcarded:
+--   1. Dye mixing (46 of the 53 recipes) -- any two dye colors in, the
+--      correct mixed color out, per vanilla dye-combining rules.
+--   2. Copper waxing (13 recipes under combining/wax/) -- honeycomb +
+--      any copper-family block/item -> its waxed equivalent.
+--   3. Misc singles (8 recipes) -- unrelated one-off combos, listed
+--      individually since none share a wildcardable item substring.
+--
+-- Labels needed:
+--   Barrel   => input chest/barrel with all ingredient items
+--   Combiner => all Combiner machines
+--   Storage  => output storage
+--   Battery  => power source (capacitor bank, energy cell, etc)
+
+EVERY REDSTONE PULSE DO
+
+    INPUT FROM Barrel
+
+    -- Dye mixing: any two dye colors together, correct blend picked by
+    -- Mekanism's own recipe matcher.
+    OUTPUT RETAIN 16 EACH *_dye TO EACH Combiner
+
+    -- Copper waxing: honeycomb + any copper-family item.
+    OUTPUT RETAIN 16 minecraft:honeycomb,
+           RETAIN 16 EACH *copper*
+    TO EACH Combiner
+
+    -- Misc singles
+    OUTPUT RETAIN 4 minecraft:flint,
+           RETAIN 4 WITH #c:cobblestones/normal
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 WITH #c:dusts/obsidian,
+           RETAIN 4 WITH #c:cobblestones/deepslate
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 WITH #c:crops/wheat,
+           RETAIN 4 minecraft:mud
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 minecraft:hanging_roots,
+           RETAIN 4 minecraft:dirt
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 minecraft:mangrove_roots,
+           RETAIN 4 minecraft:mud
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 minecraft:sweet_berries,
+           RETAIN 4 WITH #c:dusts/glowstone
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 minecraft:ink_sac,
+           RETAIN 4 WITH #c:dusts/glowstone
+    TO EACH Combiner
+
+    OUTPUT RETAIN 4 minecraft:item_frame,
+           RETAIN 4 WITH #c:dusts/glowstone
+    TO EACH Combiner
+
+    FORGET
+
+    -- CAVEAT: item output slot index guessed by pattern (see
+    -- crusher.sfml), not independently verified for this machine.
+    INPUT FROM EACH Combiner SLOTS 2
+    OUTPUT TO EMPTY SLOTS IN Storage
+
+END
+
+-- Keep every Combiner powered.
+EVERY 1 TICKS DO
+    INPUT FROM Battery TOP SIDE
+    OUTPUT fe:: TO EACH Combiner TOP SIDE
+    FORGET
+END

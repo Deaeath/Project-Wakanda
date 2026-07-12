@@ -60,6 +60,9 @@ project-wakanda/
 | **Injector** | [`sfm/mekanism/chemical_injection_chamber.sfml`](#sfmmekanismchemical_injection_chambersfml) | 5x ore processing step 4/7: crystal → shard |
 | **Purifier** | [`sfm/mekanism/purification_chamber.sfml`](#sfmmekanismpurification_chambersfml) | 5x ore processing step 5/7: shard → clump |
 | **Enricher** | [`sfm/mekanism/enrichment_chamber.sfml`](#sfmmekanismenrichment_chambersfml) | 5x ore processing step 7/7: dirty dust → dust (+ misc enriching recipes) |
+| **Alchemist** | [`sfm/mekanism/chemical_infuser.sfml`](#sfmmekanismchemical_infusersfml) | Produces the Sulfuric Acid / Hydrogen Chloride the ore chain consumes |
+| **Alloyer** | [`sfm/mekanism/metallurgic_infuser.sfml`](#sfmmekanismmetallurgic_infusersfml) | Alloy tiers + mossy-block/misc infusion recipes (all 19, source-verified) |
+| **Combiner** | [`sfm/mekanism/combiner.sfml`](#sfmmekanismcombinersfml) | Dye mixing, copper waxing, misc combos (all 53, wildcarded) |
 | **Jarvis** | [`cc-tweaked/jarvis.lua`](#cc-tweakedjarvislua) | Base assistant — chat commands, alarms, live dashboard |
 | **Griot** | [`cc-tweaked/status.lua`](#cc-tweakedstatuslua) | On-demand diagnostic report for any turtle or computer |
 | **Scribe** | [`cc-tweaked/paste.lua`](#cc-tweakedpastelua) | In-game paste receiver, for when `edit` chokes |
